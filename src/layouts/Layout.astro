@@ -1,0 +1,36 @@
+---
+import '../styles/global.css';
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="CarryCtx - Persistent project context and continuity manager for coding agents" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		
+		<!-- Google Fonts for typography -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<div class="logo">CarryCtx</div>
+				<nav class="nav-links">
+					<a href="#features">Features</a>
+					<a href="https://github.com/Xuepoo/carryctx" target="_blank" rel="noopener noreferrer">GitHub</a>
+				</nav>
+			</header>
+			<slot />
+			<footer>
+				<p>&copy; {new Date().getFullYear()} Xuepoo. MIT Licensed.</p>
+			</footer>
+		</div>
+	</body>
+</html>
