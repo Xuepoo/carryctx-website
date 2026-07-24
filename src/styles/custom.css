@@ -1,0 +1,27 @@
+/* custom.css for Starlight */
+:root {
+  --sl-color-accent-low: #1e1e2f;
+  --sl-color-accent: #6b6bff;
+  --sl-color-accent-high: #ccccff;
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #e1e1e6;
+  --sl-color-gray-2: #c4c4cc;
+  --sl-color-gray-3: #8d8d99;
+  --sl-color-gray-4: #52525e;
+  --sl-color-gray-5: #323238;
+  --sl-color-gray-6: #202024;
+  --sl-color-black: #121214;
+}
+
+/* Glassmorphism for header */
+header.header {
+  background: rgba(18, 18, 20, 0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-gradient {
+  background: -webkit-linear-gradient(45deg, #6b6bff, #00ffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
