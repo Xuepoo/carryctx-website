@@ -14,9 +14,10 @@ hero:
     - text: 查看 GitHub
       link: https://github.com/Xuepoo/carryctx
       icon: external
+      variant: secondary
 ---
 
-import { Card, CardGrid, Steps, Tabs, TabItem, LinkCard } from '@astrojs/starlight/components';
+import { Card, CardGrid, Steps, Tabs, TabItem, LinkCard, LinkButton } from '@astrojs/starlight/components';
 import Reveal from '../../../components/Reveal.astro';
 
 <div class="ctx-stats ctx-reveal">
@@ -130,9 +131,7 @@ import Reveal from '../../../components/Reveal.astro';
 <div class="ctx-cta ctx-reveal">
   <h2>准备好为你的 Agent 提供记忆了吗？</h2>
   <p>安装 CarryCtx，运行 <code>init</code>，再也不用重新解释你的项目。</p>
-  <a class="sl-link-button primary not-content" href="/zh-cn/1-getting-started/3-quickstart/">
-    立即开始 →
-  </a>
+  <LinkButton href="/zh-cn/1-getting-started/3-quickstart/" icon="right-arrow" variant="primary">立即开始</LinkButton>
 </div>
 
 <Reveal />

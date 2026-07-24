@@ -200,6 +200,14 @@ starlight-card:hover {
   border-radius: var(--ctx-radius-md) !important;
 }
 
+.sl-link-button.secondary {
+  border-color: var(--sl-color-hairline) !important;
+}
+
+.sl-link-button.secondary:hover {
+  background-color: color-mix(in srgb, var(--sl-color-text) 5%, transparent);
+}
+
 .sl-badge {
   border-radius: var(--ctx-radius-sm) !important;
 }
@@ -255,6 +263,43 @@ footer {
 }
 
 /* ============================================================
+   Hero (splash template)
+   ============================================================
+   Starlight's stock .hero switches to a 2-column grid above 50rem
+   to make room for a hero image (7fr text / 4fr image) and, without
+   an image, left-aligns the copy into that narrower 7fr column.
+   With no image on this page, that produces a cramped column that
+   wraps the display heading to 1-2 words per line with a large dead
+   zone on the right. Force the single-column, centered layout at
+   every width instead. */
+.hero {
+  grid-template-columns: 100% !important;
+  padding-block: clamp(2.5rem, calc(1rem + 8vmin), 6rem) !important;
+}
+
+.hero > .stack {
+  text-align: center !important;
+  max-width: 46rem;
+  margin-inline: auto;
+}
+
+.hero > .stack > .copy {
+  align-items: center !important;
+}
+
+.hero > .stack > .copy > * {
+  max-width: 100% !important;
+}
+
+.hero h1 {
+  text-wrap: balance;
+}
+
+.hero .actions {
+  justify-content: center !important;
+}
+
+/* ============================================================
    Homepage (splash template) — richer layout, centered rhythm
    ============================================================ */
 
@@ -304,12 +349,11 @@ footer {
 
 /* Stat strip directly under the hero. */
 .ctx-stats {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
   margin: 0 auto 3.5rem;
-  padding: 1.5rem 2rem;
+  padding: 1.5rem 1rem;
   max-width: 44rem;
   border: 1px solid var(--sl-color-hairline);
   border-radius: var(--ctx-radius-lg);
@@ -321,8 +365,32 @@ footer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
-  min-width: 8rem;
+  justify-content: center;
+  gap: 0.35rem;
+  padding-inline: 0.5rem;
+  border-inline-start: 1px solid var(--sl-color-hairline);
+}
+
+.ctx-stat:first-child {
+  border-inline-start: none;
+}
+
+@media (max-width: 30rem) {
+  .ctx-stats {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .ctx-stat {
+    border-inline-start: none;
+    border-top: 1px solid var(--sl-color-hairline);
+    padding-top: 1rem;
+  }
+
+  .ctx-stat:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
 }
 
 .ctx-stat-value {
