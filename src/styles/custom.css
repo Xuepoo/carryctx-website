@@ -253,3 +253,144 @@ footer {
   box-shadow: var(--sl-shadow-sm);
   transform: translateY(-1px);
 }
+
+/* ============================================================
+   Homepage (splash template) — richer layout, centered rhythm
+   ============================================================ */
+
+/* Center section headings + intro copy on the splash page only,
+   to match the Hero's centered composition instead of the default
+   left-aligned prose used on regular docs pages. */
+[data-has-hero] .sl-markdown-content {
+  text-align: center;
+}
+
+[data-has-hero] .sl-markdown-content h2 {
+  position: relative;
+  display: inline-block;
+  margin-inline: auto;
+  padding-bottom: 0.6rem;
+}
+
+[data-has-hero] .sl-markdown-content h2::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 2.5rem;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--sl-color-accent);
+  transform: translateX(-50%);
+}
+
+/* Card grids and tab panels stay left-aligned internally even though
+   the section heading above them is centered. */
+[data-has-hero] .card-grid,
+[data-has-hero] .sl-tabs,
+[data-has-hero] .sl-steps,
+[data-has-hero] .expressive-code {
+  text-align: start;
+}
+
+/* Intro lede paragraph under "Core Features". */
+.ctx-lede {
+  max-width: 46rem;
+  margin-inline: auto;
+  margin-bottom: 2.5rem;
+  color: var(--sl-color-gray-2);
+  font-size: var(--sl-text-lg);
+}
+
+/* Stat strip directly under the hero. */
+.ctx-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2.5rem;
+  margin: 0 auto 3.5rem;
+  padding: 1.5rem 2rem;
+  max-width: 44rem;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: var(--ctx-radius-lg);
+  background: var(--sl-color-black);
+  box-shadow: var(--sl-shadow-sm);
+}
+
+.ctx-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 8rem;
+}
+
+.ctx-stat-value {
+  font-size: var(--sl-text-2xl);
+  font-weight: 700;
+  color: var(--sl-color-text-accent);
+  font-family: var(--__sl-font-mono);
+}
+
+.ctx-stat-label {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Final call-to-action band. */
+.ctx-cta {
+  margin: 4rem auto 2rem;
+  padding: clamp(2rem, 4vw, 3.5rem);
+  max-width: 42rem;
+  text-align: center;
+  border-radius: var(--ctx-radius-lg);
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--sl-color-accent) 10%, transparent),
+    color-mix(in srgb, var(--sl-color-accent) 3%, transparent)
+  );
+  border: 1px solid var(--sl-color-accent-low);
+}
+
+.ctx-cta h2 {
+  margin-top: 0;
+}
+
+.ctx-cta p {
+  color: var(--sl-color-gray-2);
+  margin-bottom: 1.5rem;
+}
+
+.ctx-cta .sl-link-button {
+  display: inline-flex;
+}
+
+/* ============================================================
+   Micro-interactions — hairline-cheap, respects reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .card-grid > * {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  a.sl-link-button {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+
+  a.sl-link-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sl-shadow-md);
+  }
+
+  .sl-link-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .sl-link-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sl-shadow-md);
+  }
+}
+
