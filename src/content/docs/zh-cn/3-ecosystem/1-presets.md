@@ -37,6 +37,18 @@ import { Aside } from '@astrojs/starlight/components';
 | Rule（规则） | `rules/…` | 特定语言或技术栈的编码规则（例如 `rules/rust-cli`），含一组 `rules` Markdown 文件 |
 | Persona（角色） | `personas/…` | agent 在某次会话中扮演的角色定义（例如 `personas/reviewer`）；persona 可以完全不带额外文件，仅靠 manifest 的 `description` 说明 |
 
+## 可用预设列表
+
+[`carryctx-skills`](https://github.com/Xuepoo/carryctx-skills) 仓库内置了 31 个预设，分别存放在 `presets/personas/`、`presets/rules/`、`presets/workflows/` 目录下：
+
+**规则（15 个）**：`api-design`、`cloud-native`、`computer-networking`、`docker-containers`、`embedded-systems`、`git-workflow`、`golang`、`python-backend`、`qt-development`、`react-frontend`、`rust-cli`、`shell-scripting`、`sql-database`、`swift-ios`、`typescript-bun`。
+
+**工作流（9 个）**：`bugfix`、`code-review`、`dependency-upgrade`、`incident-hotfix`、`new-feature`、`performance-optimization`、`refactor`、`release-versioning`、`test-driven-development`。
+
+**角色（7 个）**：`architect`、`devops-engineer`、`performance-engineer`、`qa-engineer`、`reviewer`、`security-auditor`、`technical-writer`。
+
+上面列出的都是 manifest 的 slug；安装和激活时要用完整的 `<分类>/<slug>` 名称，例如 `carryctx preset install ../carryctx-skills/presets/rules/golang.json`，再执行 `carryctx preset apply rules/golang`。
+
 ## 安装并激活预设
 
 ```bash

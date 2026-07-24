@@ -37,6 +37,18 @@ Presets are grouped into three kinds, distinguished by the manifest name's prefi
 | Rule | `rules/…` | Domain- or stack-specific coding rules (e.g. `rules/rust-cli`), with a `rules` array of Markdown files |
 | Persona | `personas/…` | A role definition (e.g. `personas/reviewer`) an agent adopts for a session; personas may ship with no extra files, relying on the manifest description alone |
 
+## Available presets
+
+The [`carryctx-skills`](https://github.com/Xuepoo/carryctx-skills) repository ships 31 presets out of the box, grouped under `presets/personas/`, `presets/rules/`, and `presets/workflows/`:
+
+**Rules** (15): `api-design`, `cloud-native`, `computer-networking`, `docker-containers`, `embedded-systems`, `git-workflow`, `golang`, `python-backend`, `qt-development`, `react-frontend`, `rust-cli`, `shell-scripting`, `sql-database`, `swift-ios`, `typescript-bun`.
+
+**Workflows** (9): `bugfix`, `code-review`, `dependency-upgrade`, `incident-hotfix`, `new-feature`, `performance-optimization`, `refactor`, `release-versioning`, `test-driven-development`.
+
+**Personas** (7): `architect`, `devops-engineer`, `performance-engineer`, `qa-engineer`, `reviewer`, `security-auditor`, `technical-writer`.
+
+Each name above is the manifest's slug; install it with the full `<category>/<slug>` name, e.g. `carryctx preset install ../carryctx-skills/presets/rules/golang.json` then `carryctx preset apply rules/golang`.
+
 ## Installing and activating a preset
 
 ```bash
