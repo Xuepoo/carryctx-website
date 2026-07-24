@@ -61,7 +61,7 @@ carryctx task list --mine
 carryctx task show CTX-0002
 ```
 
-`task show` 会打印完整记录：标题、描述、状态、优先级、负责人、时间戳，以及依赖关系。
+`task show` 会打印完整记录（标题、描述、状态、优先级、负责人、时间戳），外加两个依赖数组：`depends_on`（当前任务的前置依赖，每项都带自己的 `status`，一眼就能看出是否还没完成）和 `blocks`（依赖当前任务的下游任务）。想知道"这个任务被什么卡住"或"这个任务解锁了什么"，直接看这两个字段即可；`carryctx graph edges` 是 AST 代码依赖图谱的独立功能，不接受任务 ID。
 
 ## 编辑任务
 
