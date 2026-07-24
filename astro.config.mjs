@@ -7,7 +7,7 @@ export default defineConfig({
     starlight({
       title: 'CarryCtx',
       description:
-        'The offline-first, Git-native context and continuity engine for coding agents.',
+        'Local-first memory for coding agents — resume tasks, checkpoints, and context across windows, sessions, and worktrees.',
       defaultLocale: 'root',
       locales: {
         root: { label: 'English', lang: 'en' },
