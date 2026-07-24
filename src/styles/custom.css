@@ -1,60 +1,83 @@
-/* Soft Reader Style for Starlight */
+/* ============================================================
+   CarryCtx — Soft Reader Theme for Starlight
+   Warm, paper-like palette anchored on #f7f7f4.
+   ============================================================ */
 
-/* Default to light, warm, soft reader colors */
-:root[data-theme='light'] {
-  --sl-color-bg: #FDFCF8; /* Warm off-white */
-  --sl-color-bg-nav: #F7F6F1; /* Slightly darker for nav */
-  --sl-color-bg-sidebar: #F7F6F1;
-  
-  --sl-color-text: #3D3D39; /* Soft charcoal */
-  --sl-color-text-accent: #6C5424; /* Warm earthy accent */
-  --sl-color-text-invert: #FDFCF8;
-  
-  --sl-color-accent-low: #EBE5D9;
-  --sl-color-accent: #8E703E;
-  --sl-color-accent-high: #5E4A2A;
+@layer starlight.core {
+  :root[data-theme='light'] {
+    /* Core surfaces */
+    --sl-color-bg: #f7f7f4;
+    --sl-color-bg-nav: #f1f0ea;
+    --sl-color-bg-sidebar: #f1f0ea;
+    --sl-color-bg-inline-code: #ece9e0;
+    --sl-color-bg-accent: #8e703e;
 
-  --sl-color-gray-1: #2E2E2C;
-  --sl-color-gray-2: #4A4A47;
-  --sl-color-gray-3: #757570;
-  --sl-color-gray-4: #B5B5B0;
-  --sl-color-gray-5: #DFDFDA;
-  --sl-color-gray-6: #F0F0EB;
+    /* Text */
+    --sl-color-text: #3d3d39;
+    --sl-color-text-accent: #6c5424;
+    --sl-color-text-invert: #f7f7f4;
 
-  --sl-color-white: #FFFFFF;
-  --sl-color-black: #111110;
+    /* Accent (warm earthy tone) */
+    --sl-color-accent-low: #ece3d1;
+    --sl-color-accent: #8e703e;
+    --sl-color-accent-high: #5e4a2a;
 
-  --sl-font-system: "Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif;
-  --sl-font-system-mono: "Fira Code", "JetBrains Mono", "Menlo", "Monaco", "Consolas", "Courier New", monospace;
+    /* Grays, warmed slightly off pure neutral */
+    --sl-color-gray-1: #2e2e2c;
+    --sl-color-gray-2: #4a4a47;
+    --sl-color-gray-3: #75726c;
+    --sl-color-gray-4: #b0ada4;
+    --sl-color-gray-5: #dcd9d0;
+    --sl-color-gray-6: #ebe9e2;
+    --sl-color-gray-7: #f1f0ea;
+
+    --sl-color-white: #17160f;
+    --sl-color-black: #ffffff;
+
+    --sl-color-hairline: #e4e1d7;
+    --sl-color-hairline-light: #ebe9e2;
+    --sl-color-hairline-shade: #dcd9d0;
+
+    --sl-font-system: 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto',
+      'Helvetica Neue', 'Arial', sans-serif;
+    --sl-font-system-mono: 'JetBrains Mono', 'Fira Code', 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
+  }
+
+  /* Soften dark mode to a matching warm charcoal, rather than pure black. */
+  :root[data-theme='dark'] {
+    --sl-color-bg: #1c1b17;
+    --sl-color-bg-nav: #181712;
+    --sl-color-bg-sidebar: #181712;
+    --sl-color-bg-inline-code: #2a2820;
+    --sl-color-bg-accent: #c7ae7e;
+
+    --sl-color-text: #d6d6d1;
+    --sl-color-text-accent: #c7ae7e;
+    --sl-color-text-invert: #1c1b17;
+
+    --sl-color-accent-low: #332a18;
+    --sl-color-accent: #c7ae7e;
+    --sl-color-accent-high: #f2e3c6;
+
+    --sl-color-gray-1: #ebe5d9;
+    --sl-color-gray-2: #c9c9c4;
+    --sl-color-gray-3: #8c8c87;
+    --sl-color-gray-4: #59564c;
+    --sl-color-gray-5: #333026;
+    --sl-color-gray-6: #262419;
+    --sl-color-gray-7: #201f16;
+
+    --sl-color-hairline: #2c2a20;
+    --sl-color-hairline-light: #262419;
+    --sl-color-hairline-shade: #131209;
+  }
 }
 
-/* Also soften the dark mode if the user switches */
-:root[data-theme='dark'] {
-  --sl-color-bg: #1A1A18; /* Soft warm dark */
-  --sl-color-bg-nav: #161614;
-  --sl-color-bg-sidebar: #161614;
-
-  --sl-color-text: #D6D6D1;
-  --sl-color-text-accent: #C7AE7E;
-  --sl-color-text-invert: #1A1A18;
-
-  --sl-color-accent-low: #332A18;
-  --sl-color-accent: #C7AE7E;
-  --sl-color-accent-high: #F2E3C6;
-
-  --sl-color-gray-1: #EBE5D9;
-  --sl-color-gray-2: #C9C9C4;
-  --sl-color-gray-3: #8C8C87;
-  --sl-color-gray-4: #545451;
-  --sl-color-gray-5: #30302E;
-  --sl-color-gray-6: #242422;
-}
-
-/* Clean up header and gradient */
+/* ── Header ─────────────────────────────────────────────── */
 header.header {
   background: var(--sl-color-bg-nav) !important;
-  border-bottom: 1px solid var(--sl-color-gray-6);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  border-bottom: 1px solid var(--sl-color-hairline);
+  box-shadow: none;
 }
 
 .text-gradient {
@@ -64,21 +87,33 @@ header.header {
   -webkit-text-fill-color: var(--sl-color-accent-high);
 }
 
-/* Typography refinements for reader style */
+/* ── Reader-first typography ───────────────────────────────
+   Slightly larger body text, generous line-height, and a
+   constrained measure for comfortable long-form reading. */
 body {
-  font-size: 16px;
-  line-height: 1.7;
-  letter-spacing: 0.02em;
+  font-size: 16.5px;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+}
+
+.sl-markdown-content {
+  font-size: var(--sl-text-base);
 }
 
 .content-panel {
-  max-width: 760px; /* Optimal reading width */
+  max-width: 760px; /* optimal reading width */
   margin: 0 auto;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 600;
   color: var(--sl-color-gray-1);
+  line-height: 1.3;
 }
 
 h1 {
@@ -87,4 +122,35 @@ h1 {
 
 p {
   color: var(--sl-color-text);
+}
+
+/* Slightly rounded, softer inline code + code blocks for a paper feel. */
+.sl-markdown-content code {
+  border-radius: 4px;
+}
+
+.sl-markdown-content pre {
+  border-radius: 10px;
+  box-shadow: var(--sl-shadow-sm);
+}
+
+/* Cards (used on the homepage / ecosystem pages) get a paper-card look. */
+.sl-markdown-content .starlight-card,
+starlight-card {
+  background: var(--sl-color-black);
+  border-color: var(--sl-color-hairline);
+  border-radius: 10px;
+  box-shadow: var(--sl-shadow-sm);
+}
+
+/* Sidebar: quieten the active-link background to match the warm palette. */
+starlight-tree-sitter,
+.sidebar-content a[aria-current='page'] {
+  background-color: var(--sl-color-accent-low);
+  color: var(--sl-color-text-accent);
+}
+
+/* Right-hand "On this page" panel */
+.right-sidebar {
+  border-inline-start: 1px solid var(--sl-color-hairline);
 }

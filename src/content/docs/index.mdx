@@ -1,0 +1,40 @@
+---
+title: CarryCtx
+description: The ultimate Git-native context preservation engine for Coding Agents and Human Developers.
+template: splash
+hero:
+  title: |
+    Welcome to <span class="text-gradient">CarryCtx</span>
+  tagline: The offline-first, zero-latency context preservation engine.
+  actions:
+    - text: Read the Docs
+      link: /1-getting-started/1-introduction/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/Xuepoo/carryctx
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Core Features
+
+Welcome to the official CarryCtx documentation hub. CarryCtx is a local-first, Git-native context engine built for coding agents (AI assistants) and human developers alike — letting work continue seamlessly across windows, sessions, and agents.
+
+<CardGrid stagger>
+  <Card title="100% Offline & Local" icon="approve-check-circle">
+    Zero latency. All state lives in `.git/carryctx/state.sqlite` — no cloud account required.
+  </Card>
+  <Card title="Git Worktree Aware" icon="branch">
+    Automatically infers the current branch, worktree, and active task, so context never needs to be re-declared across sessions.
+  </Card>
+  <Card title="AST Dependency Graph" icon="puzzle">
+    Scans code dependencies to give AI spatial awareness, reducing hallucinated cross-file assumptions.
+  </Card>
+  <Card title="Agent Agnostic" icon="rocket">
+    Claude Code, OpenCode, Copilot, or a human developer — everyone shares the same structured project memory.
+  </Card>
+</CardGrid>
+
+Pick a topic from the sidebar, or jump straight into the [Quickstart](/1-getting-started/3-quickstart/).

@@ -1,10 +1,10 @@
 ---
-title: 快照与上下文
+title: Checkpoints & Context
 ---
 
 
-为 AI 提供记忆的基础。
+The foundation of memory for AI.
 
-- `carryctx checkpoint`: 保存包含 Git Diff 与当前进度的快照。
-- `carryctx context`: 导出当前上下文（非常适合放入 LLM Prompt 中）。
-- `carryctx resume`: 恢复中断的上下文指南。
+- `carryctx checkpoint`: Save a snapshot containing the Git diff and current progress.
+- `carryctx context`: Export the current context (great for pasting into an LLM prompt).
+- `carryctx resume`: Resume an interrupted context guide.

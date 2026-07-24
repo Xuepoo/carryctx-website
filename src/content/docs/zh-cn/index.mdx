@@ -1,0 +1,40 @@
+---
+title: CarryCtx
+description: 面向 Coding Agent 与人类开发者的终极 Git 原生上下文保存引擎。
+template: splash
+hero:
+  title: |
+    欢迎使用 <span class="text-gradient">CarryCtx</span>
+  tagline: 离线优先、零延迟的上下文保存引擎。
+  actions:
+    - text: 阅读文档
+      link: /zh-cn/1-getting-started/1-introduction/
+      icon: right-arrow
+      variant: primary
+    - text: 查看 GitHub
+      link: https://github.com/Xuepoo/carryctx
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## 核心特性
+
+欢迎来到 CarryCtx 的官方文档中心。CarryCtx 是一个基于 Git 的本地优先上下文引擎，专为 Coding Agents（AI 助手）和人类开发者设计，让工作在窗口、Session 与 Agent 之间无缝延续。
+
+<CardGrid stagger>
+  <Card title="100% 离线 & 本地" icon="approve-check-circle">
+    零延迟，所有状态存储在 `.git/carryctx/state.sqlite` 中，无需任何云端账户。
+  </Card>
+  <Card title="Git Worktree 感知" icon="branch">
+    自动推断当前分支、Worktree 与活跃任务，跨 Session 无需重复声明上下文。
+  </Card>
+  <Card title="AST 语法图谱" icon="puzzle">
+    扫描代码依赖关系，让 AI 具备空间感知，减少幻觉式的跨文件假设。
+  </Card>
+  <Card title="Agent 无关" icon="rocket">
+    Claude Code、OpenCode、Copilot 或人类开发者，共享同一份结构化项目记忆。
+  </Card>
+</CardGrid>
+
+请从左侧导航栏选择你要查看的主题，或从 [快速开始](/zh-cn/1-getting-started/3-quickstart/) 直接上手。
