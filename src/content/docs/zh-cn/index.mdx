@@ -1,0 +1,137 @@
+---
+title: CarryCtx
+description: 面向 Coding Agent 的本地优先记忆层——跨窗口、跨 Session、跨 Worktree 恢复任务、快照与上下文。
+template: splash
+hero:
+  title: |
+    你的 Agent 会失忆。<span class="text-gradient">CarryCtx</span> 不会。
+  tagline: 面向 Coding Agent 的本地优先记忆层——一条命令，在任何窗口、任何 Worktree 恢复任何任务。
+  actions:
+    - text: 阅读文档
+      link: /zh-cn/1-getting-started/1-introduction/
+      icon: right-arrow
+      variant: primary
+    - text: 查看 GitHub
+      link: https://github.com/Xuepoo/carryctx
+      icon: external
+      variant: secondary
+---
+
+import { Card, CardGrid, Steps, Tabs, TabItem, LinkCard, LinkButton } from '@astrojs/starlight/components';
+import Reveal from '../../../components/Reveal.astro';
+
+<div class="ctx-stats ctx-reveal">
+  <div class="ctx-stat">
+    <span class="ctx-stat-value">0ms</span>
+    <span class="ctx-stat-label">网络往返延迟</span>
+  </div>
+  <div class="ctx-stat">
+    <span class="ctx-stat-value">SQLite</span>
+    <span class="ctx-stat-label">单文件状态存储</span>
+  </div>
+  <div class="ctx-stat">
+    <span class="ctx-stat-value">∞</span>
+    <span class="ctx-stat-label">多 Agent，共享同一份记忆</span>
+  </div>
+</div>
+
+## 核心特性
+
+<p class="ctx-lede ctx-reveal">
+  欢迎来到 CarryCtx 的官方文档中心。CarryCtx 是一个基于 Git 的本地优先上下文引擎，专为 Coding Agents（AI 助手）和人类开发者设计，让工作在窗口、Session 与 Agent 之间无缝延续。
+</p>
+
+<CardGrid stagger>
+  <Card title="100% 离线 & 本地" icon="approve-check-circle">
+    零延迟，所有状态存储在 `.git/carryctx/state.sqlite` 中，无需任何云端账户。
+  </Card>
+  <Card title="Git Worktree 感知" icon="code-branch">
+    自动推断当前分支、Worktree 与活跃任务，跨 Session 无需重复声明上下文。
+  </Card>
+  <Card title="AST 语法图谱" icon="puzzle">
+    扫描代码依赖关系，让 AI 具备空间感知，减少幻觉式的跨文件假设。
+  </Card>
+  <Card title="Agent 无关" icon="rocket">
+    Claude Code、OpenCode、Copilot 或人类开发者，共享同一份结构化项目记忆。
+  </Card>
+</CardGrid>
+
+## 为什么不直接用 Markdown 笔记？
+
+<div class="ctx-reveal">
+<CardGrid>
+  <Card title="结构化，而非流水账" icon="list-format">
+    任务、快照与决策都是可查询的结构化数据，而不是每次开新会话都要重新阅读的一大段文字。
+  </Card>
+  <Card title="Git 原生的真相来源" icon="code-branch">
+    分支、HEAD、脏工作区状态与 Diff 全部自动采集，无需手动誊写，也不会过期。
+  </Card>
+  <Card title="为交接而设计" icon="random">
+    任何 Agent、在任何 Worktree 中，执行 `carryctx resume` 即可恢复——无需翻阅聊天记录，无需重建上下文。
+  </Card>
+</CardGrid>
+</div>
+
+## 工作原理
+
+<div class="ctx-reveal">
+<Steps>
+1. **一次初始化。** `carryctx init` 会在你仓库的 `.git/` 目录内创建本地 SQLite 存储——所有数据都不离开你的机器。
+2. **认领任务。** 注册 Agent 身份，创建或认领任务，并启动 Session。CarryCtx 会根据当前 Worktree 自动推断其余上下文。
+3. **正常工作。** 记录 `progress`，在暂停前保存一个 `checkpoint`，CarryCtx 会连同 Git Diff 一并采集。
+4. **随时随地恢复。** 新窗口、新 Agent，或是同事，执行 `carryctx resume` 就能精确接续你上次的进度。
+</Steps>
+</div>
+
+## 实际效果
+
+<div class="ctx-reveal">
+<Tabs>
+  <TabItem label="初始化">
+    ```bash
+    carryctx init
+    carryctx agent register --name my-agent --provider user
+    ```
+  </TabItem>
+  <TabItem label="开始工作">
+    ```bash
+    carryctx task create --title "上线导出功能"
+    carryctx task claim CTX-0001
+    carryctx progress todo "接入 CSV 写入器"
+    ```
+  </TabItem>
+  <TabItem label="保存快照">
+    ```bash
+    carryctx checkpoint \
+      --done "实现了 CSV 写入器" \
+      --remaining "增加流式写入支持"
+    ```
+  </TabItem>
+  <TabItem label="恢复上下文">
+    ```bash
+    carryctx resume
+    # → 任务 CTX-0001，最近一次快照 12 分钟前，
+    #   分支 feature/csv-export，2 个文件未提交。
+    ```
+  </TabItem>
+</Tabs>
+</div>
+
+## 探索生态
+
+<div class="ctx-reveal">
+<CardGrid>
+  <LinkCard title="快速开始" description="不到一分钟，从零到追踪你的第一个任务。" href="/zh-cn/1-getting-started/3-quickstart/" />
+  <LinkCard title="CLI 参考" description="从任务生命周期到 Worktree 与 AST 图谱的全部命令。" href="/zh-cn/2-cli-reference/1-project-lifecycle/" />
+  <LinkCard title="MCP 集成" description="将 CarryCtx 直接接入 Cursor、Claude Desktop 等 MCP 客户端。" href="/zh-cn/3-ecosystem/2-mcp-server/" />
+  <LinkCard title="核心概念" description="Project、Agent、Session、Task、Checkpoint——理解其余一切的五个基础概念。" href="/zh-cn/1-getting-started/2-concepts/" />
+</CardGrid>
+</div>
+
+<div class="ctx-cta ctx-reveal">
+  <h2>准备好为你的 Agent 提供记忆了吗？</h2>
+  <p>安装 CarryCtx，运行 <code>init</code>，再也不用重新解释你的项目。</p>
+  <LinkButton href="/zh-cn/1-getting-started/3-quickstart/" icon="right-arrow" variant="primary">立即开始</LinkButton>
+</div>
+
+<Reveal />

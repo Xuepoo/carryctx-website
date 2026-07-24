@@ -1,12 +1,12 @@
 ---
-title: 会话与进度
+title: Sessions & Progress
 ---
 
 
-微观层面追踪你的思路。
+Track your thinking at the micro level.
 
-- `carryctx session start`: 开启会话 (自动推断活跃任务)。
-- `carryctx session end`: 结束会话。
-- `carryctx progress todo <TEXT>`: 记录待办事项。
-- `carryctx progress done <TEXT>`: 记录已完成。
-- `carryctx progress block <TEXT>`: 记录阻塞点。
+- `carryctx session start`: Start a session (automatically infers the active task).
+- `carryctx session end`: End a session.
+- `carryctx progress todo <TEXT>`: Record a to-do item.
+- `carryctx progress done <TEXT>`: Record a completed item.
+- `carryctx progress block <TEXT>`: Record a blocker.

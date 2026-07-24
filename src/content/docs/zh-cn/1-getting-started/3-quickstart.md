@@ -1,19 +1,19 @@
 ---
-title: Quickstart
+title: 快速开始
 ---
 
 
-## 1. Initialize
+## 1. 初始化
 ```bash
 carryctx init
 ```
 
-## 2. Register an Agent
+## 2. 注册 Agent
 ```bash
 carryctx agent register --name my-agent --provider user
 ```
 
-## 3. Create and Claim a Task
+## 3. 创建与认领任务
 ```bash
 carryctx task create --title "First Task"
 carryctx task claim CTX-0001

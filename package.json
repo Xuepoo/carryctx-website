@@ -1,5 +1,5 @@
 {
-  "name": "extinct-equinox",
+  "name": "carryctx-website",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/mdx": "^7.0.3",
     "@astrojs/starlight": "^0.41.4",
     "astro": "^7.1.3"
   }

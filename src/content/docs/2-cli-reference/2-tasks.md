@@ -1,12 +1,12 @@
 ---
-title: 任务管理 (Task)
+title: Task Management
 ---
 
 
-创建与流转工作单元。
+Create and move work units through their workflow.
 
-- `carryctx task create`: 创建新任务，支持 `--depends-on`。
-- `carryctx task claim <ID>`: 认领任务。
-- `carryctx task list`: 查看任务列表。
-- `carryctx task complete`: 标记任务完成。
-- `carryctx task deps`: 增删任务依赖关系。
+- `carryctx task create`: Create a new task, supports `--depends-on`.
+- `carryctx task claim <ID>`: Claim a task.
+- `carryctx task list`: View the task list.
+- `carryctx task complete`: Mark a task as complete.
+- `carryctx task deps`: Add or remove task dependencies.

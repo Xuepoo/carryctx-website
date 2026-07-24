@@ -1,60 +1,113 @@
-/* Soft Reader Style for Starlight */
+/* ============================================================
+   CarryCtx — Soft Reader Theme for Starlight
+   Warm, paper-like palette anchored on #f7f7f4.
+   NOTE: intentionally NOT wrapped in `@layer` — Starlight's own
+   tokens live in `@layer starlight.core`, and unlayered rules
+   always win the cascade over layered ones, so this is the
+   simplest reliable way to override CSS custom properties.
+   ============================================================ */
 
-/* Default to light, warm, soft reader colors */
 :root[data-theme='light'] {
-  --sl-color-bg: #FDFCF8; /* Warm off-white */
-  --sl-color-bg-nav: #F7F6F1; /* Slightly darker for nav */
-  --sl-color-bg-sidebar: #F7F6F1;
-  
-  --sl-color-text: #3D3D39; /* Soft charcoal */
-  --sl-color-text-accent: #6C5424; /* Warm earthy accent */
-  --sl-color-text-invert: #FDFCF8;
-  
-  --sl-color-accent-low: #EBE5D9;
-  --sl-color-accent: #8E703E;
-  --sl-color-accent-high: #5E4A2A;
+  /* Core surfaces */
+  --sl-color-bg: #f7f7f4;
+  --sl-color-bg-nav: #f1f0ea;
+  --sl-color-bg-sidebar: #f1f0ea;
+  --sl-color-bg-inline-code: #ece9e0;
+  --sl-color-bg-accent: #8e703e;
 
-  --sl-color-gray-1: #2E2E2C;
-  --sl-color-gray-2: #4A4A47;
-  --sl-color-gray-3: #757570;
-  --sl-color-gray-4: #B5B5B0;
-  --sl-color-gray-5: #DFDFDA;
-  --sl-color-gray-6: #F0F0EB;
+  /* Text */
+  --sl-color-text: #3d3d39;
+  --sl-color-text-accent: #6c5424;
+  --sl-color-text-invert: #f7f7f4;
 
-  --sl-color-white: #FFFFFF;
-  --sl-color-black: #111110;
+  /* Accent (warm earthy tone) */
+  --sl-color-accent-low: #ece3d1;
+  --sl-color-accent: #8e703e;
+  --sl-color-accent-high: #5e4a2a;
 
-  --sl-font-system: "Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif;
-  --sl-font-system-mono: "Fira Code", "JetBrains Mono", "Menlo", "Monaco", "Consolas", "Courier New", monospace;
+  /* Grays, warmed slightly off pure neutral */
+  --sl-color-gray-1: #2e2e2c;
+  --sl-color-gray-2: #4a4a47;
+  --sl-color-gray-3: #75726c;
+  --sl-color-gray-4: #b0ada4;
+  --sl-color-gray-5: #dcd9d0;
+  --sl-color-gray-6: #ebe9e2;
+  --sl-color-gray-7: #f1f0ea;
+
+  --sl-color-white: #17160f;
+  --sl-color-black: #ffffff;
+
+  --sl-color-hairline: #e4e1d7;
+  --sl-color-hairline-light: #ebe9e2;
+  --sl-color-hairline-shade: #dcd9d0;
+
+  --sl-font-system: 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto',
+    'Helvetica Neue', 'Arial', sans-serif;
+  --sl-font-system-mono: 'JetBrains Mono', 'Fira Code', 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
+
+  /* Soft, warm shadows instead of Starlight's neutral defaults. */
+  --sl-shadow-sm: 0 1px 2px hsla(30, 15%, 20%, 0.05), 0 1px 1px hsla(30, 15%, 20%, 0.04);
+  --sl-shadow-md: 0 4px 10px hsla(30, 15%, 20%, 0.06), 0 1px 3px hsla(30, 15%, 20%, 0.05);
+  --sl-shadow-lg: 0 12px 28px hsla(30, 15%, 20%, 0.08), 0 2px 6px hsla(30, 15%, 20%, 0.05);
+
+  /* Shared corner radius scale for a consistent, modern rounded look. */
+  --ctx-radius-sm: 6px;
+  --ctx-radius-md: 10px;
+  --ctx-radius-lg: 16px;
 }
 
-/* Also soften the dark mode if the user switches */
+/* Soften dark mode to a matching warm charcoal, rather than pure black. */
 :root[data-theme='dark'] {
-  --sl-color-bg: #1A1A18; /* Soft warm dark */
-  --sl-color-bg-nav: #161614;
-  --sl-color-bg-sidebar: #161614;
+  --sl-color-bg: #1c1b17;
+  --sl-color-bg-nav: #181712;
+  --sl-color-bg-sidebar: #181712;
+  --sl-color-bg-inline-code: #2a2820;
+  --sl-color-bg-accent: #c7ae7e;
 
-  --sl-color-text: #D6D6D1;
-  --sl-color-text-accent: #C7AE7E;
-  --sl-color-text-invert: #1A1A18;
+  --sl-color-text: #d6d6d1;
+  --sl-color-text-accent: #c7ae7e;
+  --sl-color-text-invert: #1c1b17;
 
-  --sl-color-accent-low: #332A18;
-  --sl-color-accent: #C7AE7E;
-  --sl-color-accent-high: #F2E3C6;
+  --sl-color-accent-low: #332a18;
+  --sl-color-accent: #c7ae7e;
+  --sl-color-accent-high: #f2e3c6;
 
-  --sl-color-gray-1: #EBE5D9;
-  --sl-color-gray-2: #C9C9C4;
-  --sl-color-gray-3: #8C8C87;
-  --sl-color-gray-4: #545451;
-  --sl-color-gray-5: #30302E;
-  --sl-color-gray-6: #242422;
+  --sl-color-gray-1: #ebe5d9;
+  --sl-color-gray-2: #c9c9c4;
+  --sl-color-gray-3: #8c8c87;
+  --sl-color-gray-4: #59564c;
+  --sl-color-gray-5: #333026;
+  --sl-color-gray-6: #262419;
+  --sl-color-gray-7: #201f16;
+
+  --sl-color-hairline: #2c2a20;
+  --sl-color-hairline-light: #262419;
+  --sl-color-hairline-shade: #131209;
+
+  --sl-shadow-sm: 0 1px 2px hsla(0, 0%, 0%, 0.35), 0 1px 1px hsla(0, 0%, 0%, 0.3);
+  --sl-shadow-md: 0 4px 10px hsla(0, 0%, 0%, 0.4), 0 1px 3px hsla(0, 0%, 0%, 0.3);
+  --sl-shadow-lg: 0 16px 32px hsla(0, 0%, 0%, 0.5), 0 2px 6px hsla(0, 0%, 0%, 0.3);
+
+  --ctx-radius-sm: 6px;
+  --ctx-radius-md: 10px;
+  --ctx-radius-lg: 16px;
 }
 
-/* Clean up header and gradient */
+/* ── Global rounding + smoothing ───────────────────────────
+   A single consistent corner-radius scale applied across nav,
+   sidebar, buttons, cards, code, and search — the biggest
+   single lever for a "modern" feel. */
+* {
+  scroll-behavior: smooth;
+}
+
+/* ── Header / nav ───────────────────────────────────────── */
 header.header {
-  background: var(--sl-color-bg-nav) !important;
-  border-bottom: 1px solid var(--sl-color-gray-6);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  background: color-mix(in srgb, var(--sl-color-bg-nav) 92%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--sl-color-hairline);
+  box-shadow: none;
 }
 
 .text-gradient {
@@ -64,21 +117,39 @@ header.header {
   -webkit-text-fill-color: var(--sl-color-accent-high);
 }
 
-/* Typography refinements for reader style */
+site-search button,
+site-search input,
+site-search dialog {
+  border-radius: var(--ctx-radius-md) !important;
+}
+
+/* ── Reader-first typography ───────────────────────────────
+   Slightly larger body text, generous line-height, and a
+   constrained measure for comfortable long-form reading. */
 body {
-  font-size: 16px;
-  line-height: 1.7;
-  letter-spacing: 0.02em;
+  font-size: 16.5px;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+}
+
+.sl-markdown-content {
+  font-size: var(--sl-text-base);
 }
 
 .content-panel {
-  max-width: 760px; /* Optimal reading width */
-  margin: 0 auto;
+  max-width: 760px; /* optimal reading width */
+  margin-inline: auto;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 600;
   color: var(--sl-color-gray-1);
+  line-height: 1.3;
 }
 
 h1 {
@@ -88,3 +159,306 @@ h1 {
 p {
   color: var(--sl-color-text);
 }
+
+/* ── Code ───────────────────────────────────────────────── */
+.sl-markdown-content code {
+  border-radius: var(--ctx-radius-sm);
+}
+
+.sl-markdown-content pre {
+  border-radius: var(--ctx-radius-md);
+  box-shadow: var(--sl-shadow-sm);
+}
+
+/* Expressive Code frames (the window chrome around fenced code blocks). */
+.expressive-code .frame {
+  border-radius: var(--ctx-radius-md) !important;
+  box-shadow: var(--sl-shadow-sm) !important;
+}
+.expressive-code .frame pre {
+  border-radius: var(--ctx-radius-md) !important;
+}
+
+/* ── Cards & buttons ────────────────────────────────────── */
+.sl-markdown-content .starlight-card,
+starlight-card,
+[class*='card'] {
+  background: var(--sl-color-black);
+  border-color: var(--sl-color-hairline);
+  border-radius: var(--ctx-radius-lg);
+  box-shadow: var(--sl-shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.sl-markdown-content .starlight-card:hover,
+starlight-card:hover {
+  box-shadow: var(--sl-shadow-md);
+  transform: translateY(-1px);
+}
+
+.sl-link-button {
+  border-radius: var(--ctx-radius-md) !important;
+}
+
+.sl-link-button.secondary {
+  border-color: var(--sl-color-hairline) !important;
+}
+
+.sl-link-button.secondary:hover {
+  background-color: color-mix(in srgb, var(--sl-color-text) 5%, transparent);
+}
+
+.sl-badge {
+  border-radius: var(--ctx-radius-sm) !important;
+}
+
+/* Aside/callout boxes (Note, Tip, Caution, Danger). */
+.starlight-aside {
+  border-radius: var(--ctx-radius-md);
+  box-shadow: var(--sl-shadow-sm);
+}
+
+/* ── Sidebar ────────────────────────────────────────────── */
+.sidebar-pane {
+  border-inline-end: 1px solid var(--sl-color-hairline);
+}
+
+.sidebar-content a {
+  border-radius: var(--ctx-radius-sm);
+}
+
+.sidebar-content a[aria-current='page'],
+.sidebar-content summary[aria-current='page'] {
+  background-color: var(--sl-color-accent-low);
+  color: var(--sl-color-text-accent);
+  font-weight: 600;
+}
+
+/* ── Right-hand "On this page" panel ───────────────────────
+   Align its top edge with the main content column instead of
+   the default slightly-offset baseline. */
+.right-sidebar {
+  border-inline-start: 1px solid var(--sl-color-hairline);
+}
+
+.right-sidebar-panel {
+  padding-top: 0;
+}
+
+/* ── Footer ─────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--sl-color-hairline);
+}
+
+/* ── Pagination / prev-next links ──────────────────────── */
+.pagination-links a {
+  border-radius: var(--ctx-radius-md);
+  border-color: var(--sl-color-hairline);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.pagination-links a:hover {
+  box-shadow: var(--sl-shadow-sm);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   Hero (splash template)
+   ============================================================
+   Starlight's stock .hero switches to a 2-column grid above 50rem
+   to make room for a hero image (7fr text / 4fr image) and, without
+   an image, left-aligns the copy into that narrower 7fr column.
+   With no image on this page, that produces a cramped column that
+   wraps the display heading to 1-2 words per line with a large dead
+   zone on the right. Force the single-column, centered layout at
+   every width instead. */
+.hero {
+  grid-template-columns: 100% !important;
+  padding-block: clamp(2.5rem, calc(1rem + 8vmin), 6rem) !important;
+}
+
+.hero > .stack {
+  text-align: center !important;
+  max-width: 46rem;
+  margin-inline: auto;
+}
+
+.hero > .stack > .copy {
+  align-items: center !important;
+}
+
+.hero > .stack > .copy > * {
+  max-width: 100% !important;
+}
+
+.hero h1 {
+  text-wrap: balance;
+}
+
+.hero .actions {
+  justify-content: center !important;
+}
+
+/* ============================================================
+   Homepage (splash template) — richer layout, centered rhythm
+   ============================================================ */
+
+/* Center section headings + intro copy on the splash page only,
+   to match the Hero's centered composition instead of the default
+   left-aligned prose used on regular docs pages. */
+[data-has-hero] .sl-markdown-content {
+  text-align: center;
+}
+
+[data-has-hero] .sl-markdown-content h2 {
+  position: relative;
+  display: inline-block;
+  margin-inline: auto;
+  padding-bottom: 0.6rem;
+}
+
+[data-has-hero] .sl-markdown-content h2::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 2.5rem;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--sl-color-accent);
+  transform: translateX(-50%);
+}
+
+/* Card grids and tab panels stay left-aligned internally even though
+   the section heading above them is centered. */
+[data-has-hero] .card-grid,
+[data-has-hero] .sl-tabs,
+[data-has-hero] .sl-steps,
+[data-has-hero] .expressive-code {
+  text-align: start;
+}
+
+/* Intro lede paragraph under "Core Features". */
+.ctx-lede {
+  max-width: 46rem;
+  margin-inline: auto;
+  margin-bottom: 2.5rem;
+  color: var(--sl-color-gray-2);
+  font-size: var(--sl-text-lg);
+}
+
+/* Stat strip directly under the hero. */
+.ctx-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 0 auto 3.5rem;
+  padding: 1.5rem 1rem;
+  max-width: 44rem;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: var(--ctx-radius-lg);
+  background: var(--sl-color-black);
+  box-shadow: var(--sl-shadow-sm);
+}
+
+.ctx-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding-inline: 0.5rem;
+  border-inline-start: 1px solid var(--sl-color-hairline);
+}
+
+.ctx-stat:first-child {
+  border-inline-start: none;
+}
+
+@media (max-width: 30rem) {
+  .ctx-stats {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .ctx-stat {
+    border-inline-start: none;
+    border-top: 1px solid var(--sl-color-hairline);
+    padding-top: 1rem;
+  }
+
+  .ctx-stat:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+.ctx-stat-value {
+  font-size: var(--sl-text-2xl);
+  font-weight: 700;
+  color: var(--sl-color-text-accent);
+  font-family: var(--__sl-font-mono);
+}
+
+.ctx-stat-label {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Final call-to-action band. */
+.ctx-cta {
+  margin: 4rem auto 2rem;
+  padding: clamp(2rem, 4vw, 3.5rem);
+  max-width: 42rem;
+  text-align: center;
+  border-radius: var(--ctx-radius-lg);
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--sl-color-accent) 10%, transparent),
+    color-mix(in srgb, var(--sl-color-accent) 3%, transparent)
+  );
+  border: 1px solid var(--sl-color-accent-low);
+}
+
+.ctx-cta h2 {
+  margin-top: 0;
+}
+
+.ctx-cta p {
+  color: var(--sl-color-gray-2);
+  margin-bottom: 1.5rem;
+}
+
+.ctx-cta .sl-link-button {
+  display: inline-flex;
+}
+
+/* ============================================================
+   Micro-interactions — hairline-cheap, respects reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .card-grid > * {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  a.sl-link-button {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+
+  a.sl-link-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sl-shadow-md);
+  }
+
+  .sl-link-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .sl-link-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sl-shadow-md);
+  }
+}
+

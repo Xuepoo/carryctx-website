@@ -1,9 +1,9 @@
 ---
-title: AST 语法树图谱
+title: AST Code Graph
 ---
 
 
-- `carryctx graph scan`: 扫描并更新本地代码图谱。
-- `carryctx graph query`: 搜索特定文件或符号的调用者。
-- `carryctx graph explain`: 生成某个组件的语义解释。
-- `carryctx graph export`: 导出图谱结构。
+- `carryctx graph scan`: Scan and update the local code graph.
+- `carryctx graph query`: Search for callers of a specific file or symbol.
+- `carryctx graph explain`: Generate a semantic explanation of a component.
+- `carryctx graph export`: Export the graph structure.

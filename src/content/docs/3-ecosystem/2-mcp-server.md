@@ -1,8 +1,8 @@
 ---
-title: MCP 集成
+title: MCP Integration
 ---
 
 
-支持 Model Context Protocol。
+Supports the Model Context Protocol.
 
-- `carryctx mcp`: 启动 stdio 服务器，允许 Cursor、Claude Desktop 等现代 IDE 客户端无缝发现和原生调用 CarryCtx 工具集。
+- `carryctx mcp`: Starts a stdio server, allowing modern IDE clients like Cursor and Claude Desktop to seamlessly discover and natively invoke the CarryCtx toolset.

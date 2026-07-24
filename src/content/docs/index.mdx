@@ -1,0 +1,138 @@
+---
+title: CarryCtx
+description: Local-first memory for coding agents. Resume tasks, checkpoints, and context across windows, sessions, and worktrees.
+template: splash
+hero:
+  title: |
+    Your agent forgets. <span class="text-gradient">CarryCtx</span> doesn't.
+  tagline: A local-first memory layer for coding agents. Resume any task, in any window, on any worktree, with one command.
+  actions:
+    - text: Read the Docs
+      link: /1-getting-started/1-introduction/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/Xuepoo/carryctx
+      icon: external
+      variant: secondary
+---
+
+import { Card, CardGrid, Steps, Tabs, TabItem, LinkCard, LinkButton } from '@astrojs/starlight/components';
+import Reveal from '../../components/Reveal.astro';
+
+<div class="ctx-stats ctx-reveal">
+  <div class="ctx-stat">
+    <span class="ctx-stat-value">0ms</span>
+    <span class="ctx-stat-label">network round-trip</span>
+  </div>
+  <div class="ctx-stat">
+    <span class="ctx-stat-value">SQLite</span>
+    <span class="ctx-stat-label">single-file state store</span>
+  </div>
+  <div class="ctx-stat">
+    <span class="ctx-stat-value">∞</span>
+    <span class="ctx-stat-label">agents, one shared memory</span>
+  </div>
+</div>
+
+## Core Features
+
+<p class="ctx-lede ctx-reveal">
+  CarryCtx is a local-first, Git-native context engine built for coding agents and the humans
+  working alongside them. It lets work continue seamlessly across windows, sessions, and agents.
+</p>
+
+<CardGrid stagger>
+  <Card title="100% Offline & Local" icon="approve-check-circle">
+    Zero latency. All state lives in `.git/carryctx/state.sqlite`. No cloud account required.
+  </Card>
+  <Card title="Git Worktree Aware" icon="code-branch">
+    Automatically infers the current branch, worktree, and active task, so context never needs re-declaring across sessions.
+  </Card>
+  <Card title="AST Dependency Graph" icon="puzzle">
+    Scans code dependencies to give AI spatial awareness, reducing hallucinated cross-file assumptions.
+  </Card>
+  <Card title="Agent Agnostic" icon="rocket">
+    Claude Code, OpenCode, Copilot, or a human developer: everyone shares the same structured project memory.
+  </Card>
+</CardGrid>
+
+## Why not just Markdown notes?
+
+<div class="ctx-reveal">
+<CardGrid>
+  <Card title="Structured, not prose" icon="list-format">
+    Tasks, checkpoints, and decisions are queryable rows, not paragraphs an agent has to re-parse from scratch every session.
+  </Card>
+  <Card title="Git-native truth" icon="code-branch">
+    Branch, HEAD, dirty state, and diffs are captured automatically. Never manually transcribed, never stale.
+  </Card>
+  <Card title="Built for hand-off" icon="random">
+    Any agent, in any worktree, resumes with `carryctx resume`. No chat history to re-read, no context to rebuild.
+  </Card>
+</CardGrid>
+</div>
+
+## How it works
+
+<div class="ctx-reveal">
+<Steps>
+1. **Initialize once.** `carryctx init` creates a local SQLite store inside your repo's `.git/` directory. Nothing leaves your machine.
+2. **Claim a task.** Register your agent identity, create or claim a task, and start a session. CarryCtx infers the rest from your current worktree.
+3. **Work normally.** Log `progress`, drop a `checkpoint` before you stop, and let CarryCtx capture the Git diff alongside your notes.
+4. **Resume anywhere.** A new window, a new agent, or a teammate runs `carryctx resume` and picks up exactly where you left off.
+</Steps>
+</div>
+
+## See it in action
+
+<div class="ctx-reveal">
+<Tabs>
+  <TabItem label="Initialize">
+    ```bash
+    carryctx init
+    carryctx agent register --name my-agent --provider user
+    ```
+  </TabItem>
+  <TabItem label="Work">
+    ```bash
+    carryctx task create --title "Ship the exporter"
+    carryctx task claim CTX-0001
+    carryctx progress todo "Wire up the CSV writer"
+    ```
+  </TabItem>
+  <TabItem label="Checkpoint">
+    ```bash
+    carryctx checkpoint \
+      --done "Implemented CSV writer" \
+      --remaining "Add streaming support"
+    ```
+  </TabItem>
+  <TabItem label="Resume">
+    ```bash
+    carryctx resume
+    # Task CTX-0001, last checkpoint 12m ago,
+    # branch feature/csv-export, 2 files dirty.
+    ```
+  </TabItem>
+</Tabs>
+</div>
+
+## Explore the ecosystem
+
+<div class="ctx-reveal">
+<CardGrid>
+  <LinkCard title="Quickstart" description="Go from zero to your first tracked task in under a minute." href="/1-getting-started/3-quickstart/" />
+  <LinkCard title="CLI Reference" description="Every command, from task lifecycle to worktrees and AST graphs." href="/2-cli-reference/1-project-lifecycle/" />
+  <LinkCard title="MCP Integration" description="Plug CarryCtx straight into Cursor, Claude Desktop, and other MCP clients." href="/3-ecosystem/2-mcp-server/" />
+  <LinkCard title="Core Concepts" description="Project, Agent, Session, Task, Checkpoint: the five ideas everything else is built on." href="/1-getting-started/2-concepts/" />
+</CardGrid>
+</div>
+
+<div class="ctx-cta ctx-reveal">
+  <h2>Ready to give your agents a memory?</h2>
+  <p>Install CarryCtx, run <code>init</code>, and stop re-explaining your project.</p>
+  <LinkButton href="/1-getting-started/3-quickstart/" icon="right-arrow" variant="primary">Get started</LinkButton>
+</div>
+
+<Reveal />

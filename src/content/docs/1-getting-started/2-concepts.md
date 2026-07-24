@@ -1,11 +1,11 @@
 ---
-title: 核心概念
+title: Core Concepts
 ---
 
 
-- **Project**: 对应一个 Git 仓库及其根目录。
-- **Agent**: 参与开发的实体（人类或 AI）。
-- **Task**: 基础的任务单元（如 CTX-0001）。
-- **Session**: 持续的开发会话。
-- **Checkpoint**: 持久化的上下文快照。
-- **Progress**: 微日志 (todo, done, block, note)。
+- **Project**: Corresponds to a Git repository and its root directory.
+- **Agent**: An entity participating in development (human or AI).
+- **Task**: The basic unit of work (e.g. CTX-0001).
+- **Session**: An ongoing development session.
+- **Checkpoint**: A persisted snapshot of context.
+- **Progress**: Micro-logs (todo, done, block, note).

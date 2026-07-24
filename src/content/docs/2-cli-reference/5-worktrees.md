@@ -1,10 +1,10 @@
 ---
-title: Git 工作区 (Worktree)
+title: Git Worktrees
 ---
 
 
-隔离的并行开发空间。
+Isolated spaces for parallel development.
 
-- `carryctx worktree create <BRANCH>`: 结合任务快速创建独立工作区。
-- `carryctx worktree list`: 查看工作区映射。
-- `carryctx worktree remove <BRANCH>`: 清理工作区。
+- `carryctx worktree create <BRANCH>`: Quickly create an isolated worktree tied to a task.
+- `carryctx worktree list`: View worktree mappings.
+- `carryctx worktree remove <BRANCH>`: Clean up a worktree.
