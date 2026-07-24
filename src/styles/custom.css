@@ -1,81 +1,111 @@
 /* ============================================================
    CarryCtx — Soft Reader Theme for Starlight
    Warm, paper-like palette anchored on #f7f7f4.
+   NOTE: intentionally NOT wrapped in `@layer` — Starlight's own
+   tokens live in `@layer starlight.core`, and unlayered rules
+   always win the cascade over layered ones, so this is the
+   simplest reliable way to override CSS custom properties.
    ============================================================ */
 
-@layer starlight.core {
-  :root[data-theme='light'] {
-    /* Core surfaces */
-    --sl-color-bg: #f7f7f4;
-    --sl-color-bg-nav: #f1f0ea;
-    --sl-color-bg-sidebar: #f1f0ea;
-    --sl-color-bg-inline-code: #ece9e0;
-    --sl-color-bg-accent: #8e703e;
+:root[data-theme='light'] {
+  /* Core surfaces */
+  --sl-color-bg: #f7f7f4;
+  --sl-color-bg-nav: #f1f0ea;
+  --sl-color-bg-sidebar: #f1f0ea;
+  --sl-color-bg-inline-code: #ece9e0;
+  --sl-color-bg-accent: #8e703e;
 
-    /* Text */
-    --sl-color-text: #3d3d39;
-    --sl-color-text-accent: #6c5424;
-    --sl-color-text-invert: #f7f7f4;
+  /* Text */
+  --sl-color-text: #3d3d39;
+  --sl-color-text-accent: #6c5424;
+  --sl-color-text-invert: #f7f7f4;
 
-    /* Accent (warm earthy tone) */
-    --sl-color-accent-low: #ece3d1;
-    --sl-color-accent: #8e703e;
-    --sl-color-accent-high: #5e4a2a;
+  /* Accent (warm earthy tone) */
+  --sl-color-accent-low: #ece3d1;
+  --sl-color-accent: #8e703e;
+  --sl-color-accent-high: #5e4a2a;
 
-    /* Grays, warmed slightly off pure neutral */
-    --sl-color-gray-1: #2e2e2c;
-    --sl-color-gray-2: #4a4a47;
-    --sl-color-gray-3: #75726c;
-    --sl-color-gray-4: #b0ada4;
-    --sl-color-gray-5: #dcd9d0;
-    --sl-color-gray-6: #ebe9e2;
-    --sl-color-gray-7: #f1f0ea;
+  /* Grays, warmed slightly off pure neutral */
+  --sl-color-gray-1: #2e2e2c;
+  --sl-color-gray-2: #4a4a47;
+  --sl-color-gray-3: #75726c;
+  --sl-color-gray-4: #b0ada4;
+  --sl-color-gray-5: #dcd9d0;
+  --sl-color-gray-6: #ebe9e2;
+  --sl-color-gray-7: #f1f0ea;
 
-    --sl-color-white: #17160f;
-    --sl-color-black: #ffffff;
+  --sl-color-white: #17160f;
+  --sl-color-black: #ffffff;
 
-    --sl-color-hairline: #e4e1d7;
-    --sl-color-hairline-light: #ebe9e2;
-    --sl-color-hairline-shade: #dcd9d0;
+  --sl-color-hairline: #e4e1d7;
+  --sl-color-hairline-light: #ebe9e2;
+  --sl-color-hairline-shade: #dcd9d0;
 
-    --sl-font-system: 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto',
-      'Helvetica Neue', 'Arial', sans-serif;
-    --sl-font-system-mono: 'JetBrains Mono', 'Fira Code', 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
-  }
+  --sl-font-system: 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto',
+    'Helvetica Neue', 'Arial', sans-serif;
+  --sl-font-system-mono: 'JetBrains Mono', 'Fira Code', 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
 
-  /* Soften dark mode to a matching warm charcoal, rather than pure black. */
-  :root[data-theme='dark'] {
-    --sl-color-bg: #1c1b17;
-    --sl-color-bg-nav: #181712;
-    --sl-color-bg-sidebar: #181712;
-    --sl-color-bg-inline-code: #2a2820;
-    --sl-color-bg-accent: #c7ae7e;
+  /* Soft, warm shadows instead of Starlight's neutral defaults. */
+  --sl-shadow-sm: 0 1px 2px hsla(30, 15%, 20%, 0.05), 0 1px 1px hsla(30, 15%, 20%, 0.04);
+  --sl-shadow-md: 0 4px 10px hsla(30, 15%, 20%, 0.06), 0 1px 3px hsla(30, 15%, 20%, 0.05);
+  --sl-shadow-lg: 0 12px 28px hsla(30, 15%, 20%, 0.08), 0 2px 6px hsla(30, 15%, 20%, 0.05);
 
-    --sl-color-text: #d6d6d1;
-    --sl-color-text-accent: #c7ae7e;
-    --sl-color-text-invert: #1c1b17;
-
-    --sl-color-accent-low: #332a18;
-    --sl-color-accent: #c7ae7e;
-    --sl-color-accent-high: #f2e3c6;
-
-    --sl-color-gray-1: #ebe5d9;
-    --sl-color-gray-2: #c9c9c4;
-    --sl-color-gray-3: #8c8c87;
-    --sl-color-gray-4: #59564c;
-    --sl-color-gray-5: #333026;
-    --sl-color-gray-6: #262419;
-    --sl-color-gray-7: #201f16;
-
-    --sl-color-hairline: #2c2a20;
-    --sl-color-hairline-light: #262419;
-    --sl-color-hairline-shade: #131209;
-  }
+  /* Shared corner radius scale for a consistent, modern rounded look. */
+  --ctx-radius-sm: 6px;
+  --ctx-radius-md: 10px;
+  --ctx-radius-lg: 16px;
 }
 
-/* ── Header ─────────────────────────────────────────────── */
+/* Soften dark mode to a matching warm charcoal, rather than pure black. */
+:root[data-theme='dark'] {
+  --sl-color-bg: #1c1b17;
+  --sl-color-bg-nav: #181712;
+  --sl-color-bg-sidebar: #181712;
+  --sl-color-bg-inline-code: #2a2820;
+  --sl-color-bg-accent: #c7ae7e;
+
+  --sl-color-text: #d6d6d1;
+  --sl-color-text-accent: #c7ae7e;
+  --sl-color-text-invert: #1c1b17;
+
+  --sl-color-accent-low: #332a18;
+  --sl-color-accent: #c7ae7e;
+  --sl-color-accent-high: #f2e3c6;
+
+  --sl-color-gray-1: #ebe5d9;
+  --sl-color-gray-2: #c9c9c4;
+  --sl-color-gray-3: #8c8c87;
+  --sl-color-gray-4: #59564c;
+  --sl-color-gray-5: #333026;
+  --sl-color-gray-6: #262419;
+  --sl-color-gray-7: #201f16;
+
+  --sl-color-hairline: #2c2a20;
+  --sl-color-hairline-light: #262419;
+  --sl-color-hairline-shade: #131209;
+
+  --sl-shadow-sm: 0 1px 2px hsla(0, 0%, 0%, 0.35), 0 1px 1px hsla(0, 0%, 0%, 0.3);
+  --sl-shadow-md: 0 4px 10px hsla(0, 0%, 0%, 0.4), 0 1px 3px hsla(0, 0%, 0%, 0.3);
+  --sl-shadow-lg: 0 16px 32px hsla(0, 0%, 0%, 0.5), 0 2px 6px hsla(0, 0%, 0%, 0.3);
+
+  --ctx-radius-sm: 6px;
+  --ctx-radius-md: 10px;
+  --ctx-radius-lg: 16px;
+}
+
+/* ── Global rounding + smoothing ───────────────────────────
+   A single consistent corner-radius scale applied across nav,
+   sidebar, buttons, cards, code, and search — the biggest
+   single lever for a "modern" feel. */
+* {
+  scroll-behavior: smooth;
+}
+
+/* ── Header / nav ───────────────────────────────────────── */
 header.header {
-  background: var(--sl-color-bg-nav) !important;
+  background: color-mix(in srgb, var(--sl-color-bg-nav) 92%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--sl-color-hairline);
   box-shadow: none;
 }
@@ -85,6 +115,12 @@ header.header {
   font-weight: 600;
   background: none;
   -webkit-text-fill-color: var(--sl-color-accent-high);
+}
+
+site-search button,
+site-search input,
+site-search dialog {
+  border-radius: var(--ctx-radius-md) !important;
 }
 
 /* ── Reader-first typography ───────────────────────────────
@@ -102,7 +138,7 @@ body {
 
 .content-panel {
   max-width: 760px; /* optimal reading width */
-  margin: 0 auto;
+  margin-inline: auto;
 }
 
 h1,
@@ -124,33 +160,96 @@ p {
   color: var(--sl-color-text);
 }
 
-/* Slightly rounded, softer inline code + code blocks for a paper feel. */
+/* ── Code ───────────────────────────────────────────────── */
 .sl-markdown-content code {
-  border-radius: 4px;
+  border-radius: var(--ctx-radius-sm);
 }
 
 .sl-markdown-content pre {
-  border-radius: 10px;
+  border-radius: var(--ctx-radius-md);
   box-shadow: var(--sl-shadow-sm);
 }
 
-/* Cards (used on the homepage / ecosystem pages) get a paper-card look. */
+/* Expressive Code frames (the window chrome around fenced code blocks). */
+.expressive-code .frame {
+  border-radius: var(--ctx-radius-md) !important;
+  box-shadow: var(--sl-shadow-sm) !important;
+}
+.expressive-code .frame pre {
+  border-radius: var(--ctx-radius-md) !important;
+}
+
+/* ── Cards & buttons ────────────────────────────────────── */
 .sl-markdown-content .starlight-card,
-starlight-card {
+starlight-card,
+[class*='card'] {
   background: var(--sl-color-black);
   border-color: var(--sl-color-hairline);
-  border-radius: 10px;
+  border-radius: var(--ctx-radius-lg);
+  box-shadow: var(--sl-shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.sl-markdown-content .starlight-card:hover,
+starlight-card:hover {
+  box-shadow: var(--sl-shadow-md);
+  transform: translateY(-1px);
+}
+
+.sl-link-button {
+  border-radius: var(--ctx-radius-md) !important;
+}
+
+.sl-badge {
+  border-radius: var(--ctx-radius-sm) !important;
+}
+
+/* Aside/callout boxes (Note, Tip, Caution, Danger). */
+.starlight-aside {
+  border-radius: var(--ctx-radius-md);
   box-shadow: var(--sl-shadow-sm);
 }
 
-/* Sidebar: quieten the active-link background to match the warm palette. */
-starlight-tree-sitter,
-.sidebar-content a[aria-current='page'] {
-  background-color: var(--sl-color-accent-low);
-  color: var(--sl-color-text-accent);
+/* ── Sidebar ────────────────────────────────────────────── */
+.sidebar-pane {
+  border-inline-end: 1px solid var(--sl-color-hairline);
 }
 
-/* Right-hand "On this page" panel */
+.sidebar-content a {
+  border-radius: var(--ctx-radius-sm);
+}
+
+.sidebar-content a[aria-current='page'],
+.sidebar-content summary[aria-current='page'] {
+  background-color: var(--sl-color-accent-low);
+  color: var(--sl-color-text-accent);
+  font-weight: 600;
+}
+
+/* ── Right-hand "On this page" panel ───────────────────────
+   Align its top edge with the main content column instead of
+   the default slightly-offset baseline. */
 .right-sidebar {
   border-inline-start: 1px solid var(--sl-color-hairline);
+}
+
+.right-sidebar-panel {
+  padding-top: 0;
+}
+
+/* ── Footer ─────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--sl-color-hairline);
+}
+
+/* ── Pagination / prev-next links ──────────────────────── */
+.pagination-links a {
+  border-radius: var(--ctx-radius-md);
+  border-color: var(--sl-color-hairline);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.pagination-links a:hover {
+  box-shadow: var(--sl-shadow-sm);
+  transform: translateY(-1px);
 }
