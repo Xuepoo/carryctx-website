@@ -61,7 +61,7 @@ carryctx task list --mine
 carryctx task show CTX-0002
 ```
 
-`task show` prints the full record: title, description, status, priority, owner, timestamps, and dependency links.
+`task show` prints the full record (title, description, status, priority, owner, timestamps) plus two dependency arrays: `depends_on` (this task's prerequisites, each with its own `status` so you can tell at a glance whether it's still incomplete) and `blocks` (tasks that depend on this one). This is the direct way to answer "what's blocking this" or "what does this unblock" for a task; `carryctx graph edges` is a separate feature for the AST code dependency graph and does not accept task IDs.
 
 ## Editing
 
