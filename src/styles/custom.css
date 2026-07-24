@@ -1,27 +1,90 @@
-/* custom.css for Starlight */
-:root {
-  --sl-color-accent-low: #1e1e2f;
-  --sl-color-accent: #6b6bff;
-  --sl-color-accent-high: #ccccff;
-  --sl-color-white: #ffffff;
-  --sl-color-gray-1: #e1e1e6;
-  --sl-color-gray-2: #c4c4cc;
-  --sl-color-gray-3: #8d8d99;
-  --sl-color-gray-4: #52525e;
-  --sl-color-gray-5: #323238;
-  --sl-color-gray-6: #202024;
-  --sl-color-black: #121214;
+/* Soft Reader Style for Starlight */
+
+/* Default to light, warm, soft reader colors */
+:root[data-theme='light'] {
+  --sl-color-bg: #FDFCF8; /* Warm off-white */
+  --sl-color-bg-nav: #F7F6F1; /* Slightly darker for nav */
+  --sl-color-bg-sidebar: #F7F6F1;
+  
+  --sl-color-text: #3D3D39; /* Soft charcoal */
+  --sl-color-text-accent: #6C5424; /* Warm earthy accent */
+  --sl-color-text-invert: #FDFCF8;
+  
+  --sl-color-accent-low: #EBE5D9;
+  --sl-color-accent: #8E703E;
+  --sl-color-accent-high: #5E4A2A;
+
+  --sl-color-gray-1: #2E2E2C;
+  --sl-color-gray-2: #4A4A47;
+  --sl-color-gray-3: #757570;
+  --sl-color-gray-4: #B5B5B0;
+  --sl-color-gray-5: #DFDFDA;
+  --sl-color-gray-6: #F0F0EB;
+
+  --sl-color-white: #FFFFFF;
+  --sl-color-black: #111110;
+
+  --sl-font-system: "Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif;
+  --sl-font-system-mono: "Fira Code", "JetBrains Mono", "Menlo", "Monaco", "Consolas", "Courier New", monospace;
 }
 
-/* Glassmorphism for header */
+/* Also soften the dark mode if the user switches */
+:root[data-theme='dark'] {
+  --sl-color-bg: #1A1A18; /* Soft warm dark */
+  --sl-color-bg-nav: #161614;
+  --sl-color-bg-sidebar: #161614;
+
+  --sl-color-text: #D6D6D1;
+  --sl-color-text-accent: #C7AE7E;
+  --sl-color-text-invert: #1A1A18;
+
+  --sl-color-accent-low: #332A18;
+  --sl-color-accent: #C7AE7E;
+  --sl-color-accent-high: #F2E3C6;
+
+  --sl-color-gray-1: #EBE5D9;
+  --sl-color-gray-2: #C9C9C4;
+  --sl-color-gray-3: #8C8C87;
+  --sl-color-gray-4: #545451;
+  --sl-color-gray-5: #30302E;
+  --sl-color-gray-6: #242422;
+}
+
+/* Clean up header and gradient */
 header.header {
-  background: rgba(18, 18, 20, 0.7) !important;
-  backdrop-filter: blur(12px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--sl-color-bg-nav) !important;
+  border-bottom: 1px solid var(--sl-color-gray-6);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
 
 .text-gradient {
-  background: -webkit-linear-gradient(45deg, #6b6bff, #00ffff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--sl-color-accent-high);
+  font-weight: 600;
+  background: none;
+  -webkit-text-fill-color: var(--sl-color-accent-high);
+}
+
+/* Typography refinements for reader style */
+body {
+  font-size: 16px;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+}
+
+.content-panel {
+  max-width: 760px; /* Optimal reading width */
+  margin: 0 auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: var(--sl-color-gray-1);
+}
+
+h1 {
+  letter-spacing: -0.02em;
+}
+
+p {
+  color: var(--sl-color-text);
 }
