@@ -81,6 +81,10 @@ carryctx hooks install
 - **`post-commit`**：每次提交后，从 `carryctx context` 查出当前活跃任务，创建一条记录了本次提交 SHA 的自动检查点。
 - **`prepare-commit-msg`**：把当前活跃任务的 display ID（例如 `[CTX-0001]`）前置到提交信息中，merge 和 squash 提交会被跳过。
 
+<Aside type="caution">
+如果仓库是 [Jujutsu (jj) colocated](https://jj-vcs.dev/) 模式（`.git/` 旁边有一个 `.jj/` 目录），`hooks install` 会直接拒绝写入这两个 hook。jj 会把提交直接写入 Git 对象存储，并通过 `jj git export` 同步引用，这条路径完全不会触发 Git 的 hook 机制——装上的 hook 只会静默地永远不触发。请改为在 `jj commit`/`jj describe` 之后手动运行 `carryctx checkpoint`。
+</Aside>
+
 参数：
 
 | 参数 | 效果 |

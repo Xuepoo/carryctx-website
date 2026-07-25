@@ -71,7 +71,7 @@ carryctx status --since 24h --compact
 
 ## `carryctx doctor`
 
-Diagnoses and can automatically fix potential issues with the project's SQLite state database. It checks: global config validity, Git repository discovery, installed CarryCtx git hooks (`post-commit`, `prepare-commit-msg`), database connectivity and schema version, orphaned tasks (tasks whose owner agent no longer exists), in-progress tasks, and active sessions.
+Diagnoses and can automatically fix potential issues with the project's SQLite state database. It checks: global config validity, Git repository discovery, installed CarryCtx git hooks (`post-commit`, `prepare-commit-msg`), [Jujutsu (jj) colocation](https://jj-vcs.dev/) (informational only), database connectivity and schema version, orphaned tasks (tasks whose owner agent no longer exists), in-progress tasks, and active sessions.
 
 | Flag | Description |
 | --- | --- |

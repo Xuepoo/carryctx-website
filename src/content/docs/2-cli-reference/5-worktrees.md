@@ -25,6 +25,10 @@ carryctx worktree create CTX-0001 --path ../ctx-0001 --branch feature/ctx-0001 -
 
 `create` first checks that the target path doesn't already exist and that the target branch doesn't already exist, erroring out before touching the filesystem if either is true. It then runs `git worktree add`, writes a recovery journal entry for the operation, and registers + binds the new worktree to the task in one step (equivalent to `bind` on the new path).
 
+<Aside type="caution">
+If the repository is [Jujutsu (jj) colocated](https://jj-vcs.dev/) (a `.jj/` directory sits alongside `.git/`), `create` refuses with a `VALIDATION_FAILED` error instead of running `git worktree add`. jj's own secondary workspaces (`jj workspace add`) have no local `.git/` at all, so CarryCtx's state commands can't read from inside one; and a directory created by `git worktree add` is invisible to `jj workspace list`. Use `jj workspace add <path>` directly, then `carryctx worktree bind <path>` from the primary colocated checkout if you need CarryCtx to track it.
+</Aside>
+
 ### `carryctx worktree bind`
 
 ```bash

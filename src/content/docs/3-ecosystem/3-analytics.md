@@ -81,6 +81,10 @@ Installs two hooks into the repository's `.git/hooks` directory:
 - **`post-commit`**: after every commit, looks up the active task from `carryctx context` and creates an auto-checkpoint noting the commit SHA.
 - **`prepare-commit-msg`**: prepends the active task's display ID (e.g. `[CTX-0001]`) to the commit message, skipping merge and squash commits.
 
+<Aside type="caution">
+If the repository is [Jujutsu (jj) colocated](https://jj-vcs.dev/) (a `.jj/` directory sits alongside `.git/`), `hooks install` refuses instead of writing these hooks. jj writes commits directly to the Git object store and syncs refs via `jj git export`, a path that never invokes Git's hook mechanism at all — installed hooks here would silently never fire. Run `carryctx checkpoint` manually after `jj commit`/`jj describe` instead.
+</Aside>
+
 Flags:
 
 | Flag | Effect |

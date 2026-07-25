@@ -28,8 +28,13 @@ carryctx checkpoint \
 
 - `branch` 与 `head`（当前分支名与提交 SHA）
 - `dirty`（工作区是否存在未提交改动）
+- `vcs_backend`（`"git"` 或 `"jj"`）与 `changed_files`（一份合并后的、在两种 backend 下都准确的变更文件列表）
 - `staged_files`、`modified_files`、`deleted_files`、`untracked_files`、`renamed_files`（每条重命名记录含 `from`/`to`）
 - `diff_files`、`diff_insertions`、`diff_deletions`（diff 汇总统计）
+
+<Aside type="note">
+如果仓库是 [Jujutsu (jj) colocated](https://jj-vcs.dev/) 模式（`.git/` 旁边有一个 `.jj/` 目录），`vcs_backend` 会报告为 `"jj"`，且 `staged_files`/`modified_files`/`untracked_files` 始终是空数组。jj 的自动工作副本快照机制会在几乎任何 `jj` 命令（包括只读命令）执行时把改动写入 Git index，这让 staged/unstaged/untracked 的三分法在这里失去意义。此时应改用 `changed_files`：它在两种 backend 下都保持准确。`dirty` 和 diff 统计在 jj 下同样保持准确。
+</Aside>
 
 `--no-git` 会跳过以上所有内容,退回使用 `--task`/会话上下文能提供的分支/head 信息（通常什么都没有）。
 
