@@ -24,12 +24,15 @@ carryctx checkpoint \
 
 ### What's captured automatically
 
-Unless `--no-git` is passed, `checkpoint` reads the repository at the project root and records a Git snapshot:
-
 - `branch` and `head` (current branch name and commit SHA)
 - `dirty` (whether the worktree has uncommitted changes)
+- `vcs_backend` (`"git"` or `"jj"`) and `changed_files` (a merged, accurate list of every changed file, regardless of backend)
 - `staged_files`, `modified_files`, `deleted_files`, `untracked_files`, and `renamed_files` (each renamed entry has `from`/`to`)
 - `diff_files`, `diff_insertions`, `diff_deletions` (aggregate diff stats)
+
+<Aside type="note">
+If the repository is [Jujutsu (jj) colocated](https://jj-vcs.dev/) (a `.jj/` directory sits alongside `.git/`), `vcs_backend` reports `"jj"` and `staged_files`/`modified_files`/`untracked_files` are always empty arrays. jj's automatic working-copy snapshotting writes to the Git index as a side effect of nearly any `jj` command, including read-only ones, which makes the staged/unstaged/untracked split meaningless there. Use `changed_files` instead: it stays accurate under both backends. `dirty` and the diff stats also remain accurate under jj.
+</Aside>
 
 `--no-git` skips all of this and falls back to whatever `--task`/session context provides for branch/head (usually nothing).
 

@@ -71,7 +71,7 @@ carryctx status --since 24h --compact
 
 ## `carryctx doctor`
 
-诊断并可自动修复项目 SQLite 状态数据库中潜在的问题。它会检查:全局配置的有效性、Git 仓库发现情况、已安装的 CarryCtx git hook(`post-commit`、`prepare-commit-msg`)、数据库连接与 schema 版本、孤立任务(owner agent 已不存在的任务)、进行中的任务,以及活跃会话。
+诊断并可自动修复项目 SQLite 状态数据库中潜在的问题。它会检查:全局配置的有效性、Git 仓库发现情况、已安装的 CarryCtx git hook(`post-commit`、`prepare-commit-msg`)、[Jujutsu (jj) colocation](https://jj-vcs.dev/) 检测(仅为提示信息)、数据库连接与 schema 版本、孤立任务(owner agent 已不存在的任务)、进行中的任务,以及活跃会话。
 
 | 参数 | 说明 |
 | --- | --- |

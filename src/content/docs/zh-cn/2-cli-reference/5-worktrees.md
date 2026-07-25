@@ -25,6 +25,10 @@ carryctx worktree create CTX-0001 --path ../ctx-0001 --branch feature/ctx-0001 -
 
 `create` 会先检查目标路径是否已存在、目标分支是否已存在,任一条件成立就直接报错退出,不会触碰文件系统。之后它会执行 `git worktree add`,为这次操作写入一条恢复用的 journal 记录,最后一步完成注册并将新工作区绑定到任务(效果等同于对新路径执行一次 `bind`)。
 
+<Aside type="caution">
+如果仓库是 [Jujutsu (jj) colocated](https://jj-vcs.dev/) 模式（`.git/` 旁边有一个 `.jj/` 目录），`create` 会直接以 `VALIDATION_FAILED` 报错拒绝执行,而不会去跑 `git worktree add`。jj 自己的二级工作区（`jj workspace add`）根本没有本地 `.git/`,CarryCtx 的状态命令无法在里面读取任何东西;而 `git worktree add` 创建出来的目录,`jj workspace list` 也认不出来。请直接使用 `jj workspace add <path>`,如果需要让 CarryCtx 追踪它,再从主 colocated 检出目录里执行 `carryctx worktree bind <path>`。
+</Aside>
+
 ### `carryctx worktree bind`
 
 ```bash
