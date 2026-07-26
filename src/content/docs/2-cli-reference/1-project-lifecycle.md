@@ -97,8 +97,12 @@ CarryCtx Doctor
 Everything looks good!
 ```
 
+<Aside type="note">
+Any command that opens the project database (including `doctor` itself) transparently applies pending schema migrations first, so an upgrade from an older `carryctx` version self-heals on the next command you run — you don't need to run `project migrate` by hand for this. `doctor`'s `database.schema` check reflects the real state: it reports `error` with the specific pending migration names (and a `carryctx project migrate` fix command) only if migrations somehow couldn't be applied, not merely because a new one exists.
+</Aside>
+
 <Aside type="caution">
-`doctor` does not currently apply repairs beyond what `carryctx init` covers for a missing database; most `error` checks point you at a fix command (like `carryctx init`) rather than silently mutating state under `--fix`.
+`doctor` does not currently apply repairs beyond schema migrations and what `carryctx init` covers for a missing database; most other `error` checks point you at a fix command (like `carryctx init`) rather than silently mutating state under `--fix`.
 </Aside>
 
 ## `carryctx project`

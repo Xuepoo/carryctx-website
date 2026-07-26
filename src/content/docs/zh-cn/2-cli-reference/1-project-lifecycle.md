@@ -97,8 +97,12 @@ CarryCtx Doctor
 Everything looks good!
 ```
 
+<Aside type="note">
+任何会打开项目数据库的命令(包括 `doctor` 本身)都会先透明地应用待处理的 schema 迁移,所以从旧版本的 `carryctx` 升级后,运行下一条命令就会自动修复,不需要手动执行 `project migrate`。`doctor` 的 `database.schema` 检查反映的是真实状态:只有在迁移确实无法应用时才会报 `error`(并给出具体缺失的迁移名和 `carryctx project migrate` 修复命令),而不是仅仅因为存在新迁移就报错。
+</Aside>
+
 <Aside type="caution">
-目前 `doctor` 除了针对缺失数据库指向 `carryctx init` 之外,并不会自动执行更多修复;大多数 `error` 检查会给出一条修复命令(比如 `carryctx init`),而不是在 `--fix` 下静默改动状态。
+目前 `doctor` 除了 schema 迁移以及针对缺失数据库指向 `carryctx init` 之外,并不会自动执行更多修复;大多数其他 `error` 检查会给出一条修复命令(比如 `carryctx init`),而不是在 `--fix` 下静默改动状态。
 </Aside>
 
 ## `carryctx project`
