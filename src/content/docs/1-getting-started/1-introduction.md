@@ -61,6 +61,7 @@ Running `carryctx --help` lists the top-level command groups. Each one maps to a
 | `stats` | Agent performance analytics: session length, throughput |
 | `hooks` | Installs Git hooks (`post-commit`, `prepare-commit-msg`) for auto-checkpointing and task-ID-prefixed commit messages |
 | `doctor` | Diagnoses and can fix project health issues: orphaned tasks, missing hooks, database drift |
+| `search` | Full-text search across tasks, progress, checkpoints, and decisions, ranked by relevance |
 
 Because `--agent`, `--session`, and `--task` are global flags with environment variable fallbacks (`CARRYCTX_AGENT`, `CARRYCTX_SESSION`, `CARRYCTX_TASK`), a long-running agent process can export them once and omit them from every subsequent call. The same global set also includes `--format` (`text`, `json`, or `markdown`), `--json` as a shorthand for `--format=json`, `--dry-run` to simulate without writing, and `--non-interactive` to fail instead of prompting.
 

@@ -61,6 +61,7 @@ Git 非常擅长记录代码在历史上每个时间点的样子。但它不是�
 | `stats` | agent 表现分析：会话时长、产出效率 |
 | `hooks` | 安装 Git hook（`post-commit`、`prepare-commit-msg`）实现自动打检查点和任务 ID 前缀的 commit message |
 | `doctor` | 诊断并可修复项目健康问题：孤儿任务、缺失的 hook、数据库漂移 |
+| `search` | 跨 Task、Progress、Checkpoint、Decision 的全文搜索，按相关度排序 |
 
 因为 `--agent`、`--session`、`--task` 都是带环境变量回退（`CARRYCTX_AGENT`、`CARRYCTX_SESSION`、`CARRYCTX_TASK`）的全局参数，一个长期运行的 agent 进程可以只导出一次，之后每次调用都省略它们。同一组全局参数还包括 `--format`（`text`、`json` 或 `markdown`）、作为 `--format=json` 简写的 `--json`、用于模拟而不写入的 `--dry-run`，以及遇到需要交互时直接失败而不弹出提示的 `--non-interactive`。
 
