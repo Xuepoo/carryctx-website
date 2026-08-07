@@ -121,16 +121,17 @@ carryctx decision add \
   --context "Need embedded storage with no external service dependency" \
   --decision "SQLite via rusqlite, one file per project" \
   --consequences "Migrations must be handled manually; no built-in replication" \
+  --rationale "Avoids running a separate database service just to track task state" \
   --task CTX-0001
 ```
 
-只有 `--title` 是必填的;`--context`、`--decision`、`--consequences` 都是可选的,但建议填写。`--task` 会回退使用当前任务上下文,如果完全无法解析出任务,命令会报错。
+只有 `--title` 是必填的;`--context`、`--decision`、`--consequences`、`--rationale` 都是可选的,但建议填写。`--rationale` 是这个决策背后的"为什么"——标题本身承载不了的部分——并会和其他字段一起被 `decision search` 检索到。`--task` 会回退使用当前任务上下文,如果完全无法解析出任务,命令会报错。
 
 ### `carryctx decision list` / `show` / `search`
 
 ```bash
 carryctx decision list
-carryctx decision show DEC-7a1c9e02
+carryctx decision show DEC-0007
 carryctx decision search "sqlite"
 ```
 
@@ -139,7 +140,7 @@ carryctx decision search "sqlite"
 ### `carryctx decision supersede`
 
 ```bash
-carryctx decision supersede DEC-7a1c9e02 --by DEC-91bb4f30
+carryctx decision supersede DEC-0007 --by DEC-0012
 ```
 
 把一条旧决策标记为已被新决策取代。`--by`(必填)是替代决策的 ID。

@@ -121,16 +121,17 @@ carryctx decision add \
   --context "Need embedded storage with no external service dependency" \
   --decision "SQLite via rusqlite, one file per project" \
   --consequences "Migrations must be handled manually; no built-in replication" \
+  --rationale "Avoids running a separate database service just to track task state" \
   --task CTX-0001
 ```
 
-Only `--title` is required; `--context`, `--decision`, and `--consequences` are optional but recommended. `--task` falls back to the current task context and the command errors if no task can be resolved at all.
+Only `--title` is required; `--context`, `--decision`, `--consequences`, and `--rationale` are optional but recommended. `--rationale` is the "why" behind the decision — the part a title alone can't carry — and is included in `decision search` along with the other fields. `--task` falls back to the current task context and the command errors if no task can be resolved at all.
 
 ### `carryctx decision list` / `show` / `search`
 
 ```bash
 carryctx decision list
-carryctx decision show DEC-7a1c9e02
+carryctx decision show DEC-0007
 carryctx decision search "sqlite"
 ```
 
@@ -139,7 +140,7 @@ carryctx decision search "sqlite"
 ### `carryctx decision supersede`
 
 ```bash
-carryctx decision supersede DEC-7a1c9e02 --by DEC-91bb4f30
+carryctx decision supersede DEC-0007 --by DEC-0012
 ```
 
 Marks an old decision as superseded by a newer one. `--by` (required) is the ID of the replacement.
