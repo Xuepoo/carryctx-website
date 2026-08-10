@@ -27,12 +27,19 @@ If you don't pass `--status`, CarryCtx picks it for you: a task with no incomple
 
 ```bash
 carryctx task create --title "Design reset email template" --priority high
-# -> CTX-0001, status: ready
+# -> Task created: CTX-0001
 
 carryctx task create --title "Wire reset flow to email service" \
   --depends-on CTX-0001 --priority high
-# -> CTX-0002, status: planned (waiting on CTX-0001)
+# -> Task created: CTX-0002 (planned, waiting on CTX-0001)
 ```
+
+Since 0.5.2, text output is compact: `task create` prints the display ID on
+one line so the next command (`task start CTX-0001`, `progress note --task
+CTX-0001`, ...) needs no JSON parsing. `--verbose` (or `[output] verbose =
+true` in `.carryctx/config.toml`) restores the full record, and the global
+`--fields display_id,status,title` flag (or the per-command `[output.fields]`
+table) trims records to an allowlist in both text and JSON output.
 
 <Aside type="tip">
 `--depends-on` at create time always creates a `strong` dependency. Use `carryctx task depend` afterward if you need an `informational` link instead.
@@ -55,7 +62,7 @@ carryctx task list --mine
 | `--owner` | Filter to tasks owned by a given agent name or ULID. |
 | `--mine` | Only show tasks owned by the current agent (from `--agent` or your configured default agent). |
 
-`--owner` and `--mine` are independent filters; combining them narrows further only if they happen to agree. Use `--format markdown` on the top-level flag to get a Markdown table instead of JSON/table output.
+`--owner` and `--mine` are independent filters; combining them narrows further only if they happen to agree. Use `--format markdown` on the top-level flag to get a Markdown table instead of the compact text lines.
 
 ```bash
 carryctx task show CTX-0002

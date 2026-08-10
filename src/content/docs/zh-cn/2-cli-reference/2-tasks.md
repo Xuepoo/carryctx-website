@@ -27,7 +27,7 @@ carryctx task create --title "Add password reset flow"
 
 ```bash
 carryctx task create --title "Design reset email template" --priority high
-# -> CTX-0001, status: ready
+# -> Task created: CTX-0001
 
 carryctx task create --title "Wire reset flow to email service" \
   --depends-on CTX-0001 --priority high
