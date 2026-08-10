@@ -31,7 +31,7 @@ CarryCtx is aimed at exactly the failure modes described above: a long-running t
 Git is extremely good at tracking what the code looked like at every point in history. It's not designed to track why a task is blocked, what a previous session already tried, or which agent currently owns a piece of work. CarryCtx fills exactly that gap, and only that gap:
 
 - Git is the source of truth for code history. CarryCtx never rewrites commits, never resolves merge conflicts, and never touches your working tree except to read its state (branch, HEAD, dirty files) for context.
-- CarryCtx is the source of truth for *why* the code is the way it is right now: which task is active, what's been tried, what's still open, who's working on it, and what decisions were made along the way.
+- CarryCtx is the source of truth for _why_ the code is the way it is right now: which task is active, what's been tried, what's still open, who's working on it, and what decisions were made along the way.
 
 Because the two layers don't overlap, you can run `carryctx init` on any existing Git repository without disturbing anything, and you can stop using CarryCtx at any point without corrupting your Git history.
 
@@ -43,25 +43,30 @@ In practice the CLI shows up at the edges of a working session, not in the middl
 
 Running `carryctx --help` lists the top-level command groups. Each one maps to a concrete piece of the "agent memory" problem:
 
-| Command | What it gives you |
-| --- | --- |
-| `task` | Structured work units with status, priority, ownership, and dependencies, not a prose to-do list |
-| `progress` | Micro-progress logs attached to a task: todos, blockers, risks, notes |
-| `session` | Explicit start/pause/resume/end lifecycle for an agent's working period |
-| `checkpoint` | Git-aware state snapshots: what was done, what's remaining, what's blocking, what's next |
-| `resume` | Reconstructs full context (task, session, checkpoint, progress, recent events) for the next agent or window |
-| `context` | Dumps active task/session context in a compact or full form, meant for feeding directly into an LLM prompt |
-| `agent` | Registers and manages the agents (human or AI) participating in the project |
-| `handoff` | Explicit hand-off requests between agents, with accept/reject |
-| `decision` | Records architectural decisions (ADRs) so the reasoning behind a choice survives past the session that made it |
-| `worktree` | Binds a Git worktree to a task, so parallel work on separate branches stays correctly attributed |
-| `graph` | Manages a context graph of nodes/edges for semantic queries over the project |
-| `event` | Queries the immutable event log underlying everything above, for auditing |
-| `mcp` | Runs a stdio Model Context Protocol server, so MCP-aware clients (Cursor, Claude Desktop, etc.) can call CarryCtx directly |
-| `stats` | Agent performance analytics: session length, throughput |
-| `hooks` | Installs Git hooks (`post-commit`, `prepare-commit-msg`) for auto-checkpointing and task-ID-prefixed commit messages |
-| `doctor` | Diagnoses and can fix project health issues: orphaned tasks, missing hooks, database drift |
-| `search` | Full-text search across tasks, progress, checkpoints, and decisions, ranked by relevance |
+| Command      | What it gives you                                                                                                          |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `init`       | Initializes CarryCtx in a repository and writes `.carryctx/config.toml`                                                    |
+| `status`     | One-shot overview of the project: active tasks, sessions, agents, worktrees                                                |
+| `task`       | Structured work units with status, priority, ownership, and dependencies, not a prose to-do list                           |
+| `progress`   | Micro-progress logs attached to a task: todos, blockers, risks, notes                                                      |
+| `session`    | Explicit start/pause/resume/end lifecycle for an agent's working period                                                    |
+| `checkpoint` | Git-aware state snapshots: what was done, what's remaining, what's blocking, what's next                                   |
+| `resume`     | Reconstructs full context (task, session, checkpoint, progress, recent events) for the next agent or window                |
+| `context`    | Dumps active task/session context in a compact or full form, meant for feeding directly into an LLM prompt                 |
+| `agent`      | Registers and manages the agents (human or AI) participating in the project                                                |
+| `handoff`    | Explicit hand-off requests between agents, with accept/reject                                                              |
+| `decision`   | Records architectural decisions (ADRs) so the reasoning behind a choice survives past the session that made it             |
+| `worktree`   | Binds a Git worktree to a task, so parallel work on separate branches stays correctly attributed                           |
+| `graph`      | Manages a context graph of nodes/edges for semantic queries over the project                                               |
+| `event`      | Queries the immutable event log underlying everything above, for auditing                                                  |
+| `mcp`        | Runs a stdio Model Context Protocol server, so MCP-aware clients (Cursor, Claude Desktop, etc.) can call CarryCtx directly |
+| `stats`      | Agent performance analytics: session length, throughput                                                                    |
+| `skill`      | Installs and manages executable agent skills (from a local path or repository)                                             |
+| `preset`     | Installs and applies reusable capability packs: workflow SOPs, coding rules, agent personas                                |
+| `sync`       | Syncs project state with remote storage                                                                                    |
+| `hooks`      | Installs Git hooks (`post-commit`, `prepare-commit-msg`) for auto-checkpointing and task-ID-prefixed commit messages       |
+| `doctor`     | Diagnoses and can fix project health issues: orphaned tasks, missing hooks, database drift                                 |
+| `search`     | Full-text search across tasks, progress, checkpoints, and decisions, ranked by relevance                                   |
 
 Because `--agent`, `--session`, and `--task` are global flags with environment variable fallbacks (`CARRYCTX_AGENT`, `CARRYCTX_SESSION`, `CARRYCTX_TASK`), a long-running agent process can export them once and omit them from every subsequent call. The same global set also includes `--format` (`text`, `json`, or `markdown`), `--json` as a shorthand for `--format=json`, `--dry-run` to simulate without writing, and `--non-interactive` to fail instead of prompting.
 

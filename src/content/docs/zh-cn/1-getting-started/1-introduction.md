@@ -43,25 +43,30 @@ Git 非常擅长记录代码在历史上每个时间点的样子。但它不是�
 
 运行 `carryctx --help` 会列出顶层命令组，每一个都对应"agent 记忆"问题的一个具体环节：
 
-| 命令 | 提供什么 |
-| --- | --- |
-| `task` | 带状态、优先级、归属和依赖关系的结构化工作单元，而不是一份散文式待办清单 |
-| `progress` | 挂在某个任务下的微进度日志：todo、blocker、risk、note |
-| `session` | 明确的会话生命周期：start / pause / resume / end |
-| `checkpoint` | 具备 Git 感知能力的状态快照：完成了什么、还剩什么、被什么阻塞、下一步是什么 |
-| `resume` | 为下一个 agent 或窗口重建完整上下文（任务、会话、检查点、进度、最近事件） |
-| `context` | 以精简或完整形式导出当前任务/会话上下文，专为直接塞进 LLM prompt 设计 |
-| `agent` | 注册和管理参与项目的 agent（人类或 AI） |
-| `handoff` | agent 之间明确的交接请求，支持 accept/reject |
-| `decision` | 记录架构决策（ADR），让选择背后的理由不会随着做决定的那次会话一起消失 |
-| `worktree` | 把一个 Git worktree 绑定到某个任务，让并行分支上的工作正确归属 |
-| `graph` | 管理由节点/边构成的上下文图谱，用于语义查询 |
-| `event` | 查询上述一切背后的不可变事件日志，用于审计 |
-| `mcp` | 运行一个 stdio Model Context Protocol 服务，让支持 MCP 的客户端（Cursor、Claude Desktop 等）直接调用 CarryCtx |
-| `stats` | agent 表现分析：会话时长、产出效率 |
-| `hooks` | 安装 Git hook（`post-commit`、`prepare-commit-msg`）实现自动打检查点和任务 ID 前缀的 commit message |
-| `doctor` | 诊断并可修复项目健康问题：孤儿任务、缺失的 hook、数据库漂移 |
-| `search` | 跨 Task、Progress、Checkpoint、Decision 的全文搜索，按相关度排序 |
+| 命令         | 提供什么                                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------------- |
+| `init`       | 在仓库中初始化 CarryCtx 并写出 `.carryctx/config.toml`                                                        |
+| `status`     | 项目全景：活动任务、会话、agent、worktree 一览                                                                |
+| `task`       | 带状态、优先级、归属和依赖关系的结构化工作单元，而不是一份散文式待办清单                                      |
+| `progress`   | 挂在某个任务下的微进度日志：todo、blocker、risk、note                                                         |
+| `session`    | 明确的会话生命周期：start / pause / resume / end                                                              |
+| `checkpoint` | 具备 Git 感知能力的状态快照：完成了什么、还剩什么、被什么阻塞、下一步是什么                                   |
+| `resume`     | 为下一个 agent 或窗口重建完整上下文（任务、会话、检查点、进度、最近事件）                                     |
+| `context`    | 以精简或完整形式导出当前任务/会话上下文，专为直接塞进 LLM prompt 设计                                         |
+| `agent`      | 注册和管理参与项目的 agent（人类或 AI）                                                                       |
+| `handoff`    | agent 之间明确的交接请求，支持 accept/reject                                                                  |
+| `decision`   | 记录架构决策（ADR），让选择背后的理由不会随着做决定的那次会话一起消失                                         |
+| `worktree`   | 把一个 Git worktree 绑定到某个任务，让并行分支上的工作正确归属                                                |
+| `graph`      | 管理由节点/边构成的上下文图谱，用于语义查询                                                                   |
+| `event`      | 查询上述一切背后的不可变事件日志，用于审计                                                                    |
+| `mcp`        | 运行一个 stdio Model Context Protocol 服务，让支持 MCP 的客户端（Cursor、Claude Desktop 等）直接调用 CarryCtx |
+| `stats`      | agent 表现分析：会话时长、产出效率                                                                            |
+| `skill`      | 安装和管理可执行的 agent skill（来自本地路径或仓库）                                                          |
+| `preset`     | 安装并应用可复用的能力包：工作流 SOP、编码规则、agent 人格                                                    |
+| `sync`       | 与远程存储同步项目状态                                                                                        |
+| `hooks`      | 安装 Git hook（`post-commit`、`prepare-commit-msg`）实现自动打检查点和任务 ID 前缀的 commit message           |
+| `doctor`     | 诊断并可修复项目健康问题：孤儿任务、缺失的 hook、数据库漂移                                                   |
+| `search`     | 跨 Task、Progress、Checkpoint、Decision 的全文搜索，按相关度排序                                              |
 
 因为 `--agent`、`--session`、`--task` 都是带环境变量回退（`CARRYCTX_AGENT`、`CARRYCTX_SESSION`、`CARRYCTX_TASK`）的全局参数，一个长期运行的 agent 进程可以只导出一次，之后每次调用都省略它们。同一组全局参数还包括 `--format`（`text`、`json` 或 `markdown`）、作为 `--format=json` 简写的 `--json`、用于模拟而不写入的 `--dry-run`，以及遇到需要交互时直接失败而不弹出提示的 `--non-interactive`。
 

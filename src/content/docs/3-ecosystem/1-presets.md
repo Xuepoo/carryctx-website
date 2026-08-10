@@ -4,7 +4,7 @@ title: Presets & Rules
 
 import { Aside } from '@astrojs/starlight/components';
 
-A preset is a small, signed-ish JSON manifest that packages a reusable piece of agent guidance, a workflow SOP, a coding rule set, or a persona, plus the Markdown file it points at, so a team can share the same conventions across projects instead of retyping them into every agent's system prompt. Presets live in a shared skills repository (for example the `carryctx-skills` project) and get installed into your project's `.carryctx/` directory.
+A preset is a small, signed-ish JSON manifest that packages a reusable piece of agent guidance, a workflow SOP, a coding rule set, or a persona, plus the Markdown file it points at, so a team can share the same conventions across projects instead of retyping them into every agent's system prompt. Presets live in a shared skills repository (for example the `carryctx-skills` project — see [Agent Skills & Handoff](./4-skills/)) and get installed into your project's `.carryctx/` directory.
 
 ## Anatomy of a preset
 
@@ -19,7 +19,11 @@ A preset is a JSON manifest with a `name`, `version`, `description`, license/aut
   "license": "MIT",
   "carryctx": { "engine": ">=0.2.0" },
   "workflows": [
-    { "source": "presets/workflows/bugfix.md", "target": "workflows/bugfix.md", "kind": "workflow" }
+    {
+      "source": "presets/workflows/bugfix.md",
+      "target": "workflows/bugfix.md",
+      "kind": "workflow"
+    }
   ],
   "permissions": {
     "requires_filesystem": true,
@@ -31,11 +35,11 @@ A preset is a JSON manifest with a `name`, `version`, `description`, license/aut
 
 Presets are grouped into three kinds, distinguished by the manifest name's prefix and content:
 
-| Kind | Manifest prefix | Contains |
-| --- | --- | --- |
-| Workflow | `workflows/…` | An SOP for a class of work (bugfix, new feature, refactor), with a `workflows` array of Markdown files to install |
-| Rule | `rules/…` | Domain- or stack-specific coding rules (e.g. `rules/rust-cli`), with a `rules` array of Markdown files |
-| Persona | `personas/…` | A role definition (e.g. `personas/reviewer`) an agent adopts for a session; personas may ship with no extra files, relying on the manifest description alone |
+| Kind     | Manifest prefix | Contains                                                                                                                                                     |
+| -------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Workflow | `workflows/…`   | An SOP for a class of work (bugfix, new feature, refactor), with a `workflows` array of Markdown files to install                                            |
+| Rule     | `rules/…`       | Domain- or stack-specific coding rules (e.g. `rules/rust-cli`), with a `rules` array of Markdown files                                                       |
+| Persona  | `personas/…`    | A role definition (e.g. `personas/reviewer`) an agent adopts for a session; personas may ship with no extra files, relying on the manifest description alone |
 
 ## Available presets
 

@@ -4,7 +4,7 @@ title: 预设与规则 (Presets)
 
 import { Aside } from '@astrojs/starlight/components';
 
-预设 (preset) 是一个精简的 JSON 描述文件，用于打包一份可复用的 agent 指导内容：工作流 SOP、编码规则集，或角色人格 (persona)，并指向它所依赖的 Markdown 正文文件，这样团队就能在多个项目间共享同一套约定，而不必在每个 agent 的系统提示里重新敲一遍。预设存放在共享的技能仓库中（例如 `carryctx-skills` 项目），安装后落地到项目的 `.carryctx/` 目录下。
+预设 (preset) 是一个精简的 JSON 描述文件，用于打包一份可复用的 agent 指导内容：工作流 SOP、编码规则集，或角色人格 (persona)，并指向它所依赖的 Markdown 正文文件，这样团队就能在多个项目间共享同一套约定，而不必在每个 agent 的系统提示里重新敲一遍。预设存放在共享的技能仓库中（例如 `carryctx-skills` 项目——参见 [Agent Skills 与 Handoff](./4-skills/)），安装后落地到项目的 `.carryctx/` 目录下。
 
 ## 预设的结构
 
@@ -19,7 +19,11 @@ import { Aside } from '@astrojs/starlight/components';
   "license": "MIT",
   "carryctx": { "engine": ">=0.2.0" },
   "workflows": [
-    { "source": "presets/workflows/bugfix.md", "target": "workflows/bugfix.md", "kind": "workflow" }
+    {
+      "source": "presets/workflows/bugfix.md",
+      "target": "workflows/bugfix.md",
+      "kind": "workflow"
+    }
   ],
   "permissions": {
     "requires_filesystem": true,
@@ -31,11 +35,11 @@ import { Aside } from '@astrojs/starlight/components';
 
 预设按 manifest 名称的前缀和内容分为三类：
 
-| 类型 | manifest 前缀 | 内容 |
-| --- | --- | --- |
-| Workflow（工作流） | `workflows/…` | 针对某类工作（修 bug、开发新功能、重构）的 SOP，含一组待安装的 `workflows` Markdown 文件 |
-| Rule（规则） | `rules/…` | 特定语言或技术栈的编码规则（例如 `rules/rust-cli`），含一组 `rules` Markdown 文件 |
-| Persona（角色） | `personas/…` | agent 在某次会话中扮演的角色定义（例如 `personas/reviewer`）；persona 可以完全不带额外文件，仅靠 manifest 的 `description` 说明 |
+| 类型               | manifest 前缀 | 内容                                                                                                                            |
+| ------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Workflow（工作流） | `workflows/…` | 针对某类工作（修 bug、开发新功能、重构）的 SOP，含一组待安装的 `workflows` Markdown 文件                                        |
+| Rule（规则）       | `rules/…`     | 特定语言或技术栈的编码规则（例如 `rules/rust-cli`），含一组 `rules` Markdown 文件                                               |
+| Persona（角色）    | `personas/…`  | agent 在某次会话中扮演的角色定义（例如 `personas/reviewer`）；persona 可以完全不带额外文件，仅靠 manifest 的 `description` 说明 |
 
 ## 可用预设列表
 
