@@ -39,7 +39,11 @@ one line so the next command (`task start CTX-0001`, `progress note --task
 CTX-0001`, ...) needs no JSON parsing. `--verbose` (or `[output] verbose =
 true` in `.carryctx/config.toml`) restores the full record, and the global
 `--fields display_id,status,title` flag (or the per-command `[output.fields]`
-table) trims records to an allowlist in both text and JSON output.
+table) trims records to an allowlist in both text and JSON output. Since
+0.5.4 the compact text lines honor the projection too: fields the default
+template skips — like `depends_on` and `blocks` — are appended when you
+request them (as their display IDs, e.g. `— needs CTX-0001`), and dropped
+fields never print empty placeholders.
 
 <Aside type="tip">
 `--depends-on` at create time always creates a `strong` dependency. Use `carryctx task depend` afterward if you need an `informational` link instead.
@@ -74,9 +78,10 @@ carryctx task show CTX-0002
 
 ```bash
 carryctx task edit CTX-0002 --title "Wire reset flow to notification service" --priority urgent
+carryctx task edit CTX-0002 --description "Revised requirements after the copy review"
 ```
 
-`task edit` only touches `--title` and `--priority`. There's no flag to change `--description`, `--owner`, or `--status` here, use the dedicated ownership/transition commands below for those.
+`task edit` touches `--title`, `--priority`, and (since 0.5.4) `--description`; only the flags you pass are changed. There's no flag to change `--owner` or `--status` here, use the dedicated ownership/transition commands below for those.
 
 ## Task lifecycle
 

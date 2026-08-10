@@ -67,9 +67,10 @@ carryctx task show CTX-0002
 
 ```bash
 carryctx task edit CTX-0002 --title "Wire reset flow to notification service" --priority urgent
+carryctx task edit CTX-0002 --description "评审后的修订需求"
 ```
 
-`task edit` 只能修改 `--title` 和 `--priority`。它没有用于修改 `--description`、`--owner` 或 `--status` 的参数，负责人和状态请使用下面的专门命令来变更。
+`task edit` 支持 `--title`、`--priority` 以及（0.5.4 起）`--description`，只修改你传入的参数。它没有用于修改 `--owner` 或 `--status` 的参数，负责人和状态请使用下面的专门命令来变更。
 
 ## 任务生命周期
 
