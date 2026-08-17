@@ -21,16 +21,16 @@ carryctx search "markdown worker protocol"
 | `<query>`（位置参数） | 搜索文本。支持 [FTS5 查询语法](https://www.sqlite.org/fts5.html#full_text_query_syntax)：引号短语（`"exact phrase"`）、布尔操作符（`term1 OR term2`）、前缀匹配（`retry*`）。 |
 | `--type <kind>` | 限定为一种实体类型：`task`、`progress`、`checkpoint`、`decision`。 |
 | `--status <status>` | 只返回拥有该记录的 Task 处于该状态的命中（例如 `in_progress`、`completed`）。 |
-| `--owner <agent>` | 只返回拥有该记录的 Task 归属于该 Agent 的命中（名称或 ULID）。 |
+| `--assignee <agent>` | 只返回拥有该记录的 Task 归属于该 Agent 的命中（名称或 ULID）。 |
 | `--limit <n>` | 最大返回条数，默认 20。 |
 
 ```bash
 carryctx search "retry backoff" --type checkpoint
-carryctx search "auth flow" --status in_progress --owner claude-code
+carryctx search "auth flow" --status in_progress --assignee claude-code
 ```
 
 <Aside type="note">
-`--owner` 有意不叫 `--agent`。CLI 中全局的 `--agent`/`CARRYCTX_AGENT` 身份参数是用 `global = true` 定义的，子命令下同名的局部参数即使这次没有传值也会悄悄继承全局参数的值 —— 这正是 0.2.1 修复过的 `event list --agent` 冲突同一个根因。用 `--owner` 直接从命名上规避了这个碰撞，而不是要求用户记住一个变通方案。
+`--assignee` 有意不叫 `--agent`。CLI 中全局的 `--agent`/`CARRYCTX_AGENT` 身份参数是用 `global = true` 定义的，子命令下同名的局部参数即使这次没有传值也会悄悄继承全局参数的值 —— 这正是 0.2.1 修复过的 `event list --agent` 冲突同一个根因。用 `--assignee` 直接从命名上规避了这个碰撞，而不是要求用户记住一个变通方案。
 </Aside>
 
 ## 每条命中都告诉你什么

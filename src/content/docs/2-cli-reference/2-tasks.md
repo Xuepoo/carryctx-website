@@ -19,7 +19,7 @@ Flags on `task create`:
 | `--title` | Required. Short descriptive title. |
 | `--description` | Markdown description of the task requirements. |
 | `--priority` | `low`, `normal` (default), `high`, or `urgent`. |
-| `--owner` | Agent name or ULID to assign the task to on creation. |
+| `--assignee` | Agent name or ULID to assign the task to on creation. |
 | `--status` | Force the initial status instead of letting CarryCtx derive it (see below). Accepts `planned`, `ready`, `in_progress`, `blocked`, `review`, `completed`, `cancelled`. |
 | `--depends-on` | Repeatable. Task ref (display ID or ULID) this task depends on. Creates a strong dependency edge. |
 
@@ -54,7 +54,7 @@ fields never print empty placeholders.
 ```bash
 carryctx task list
 carryctx task list --status ready
-carryctx task list --owner alice
+carryctx task list --assignee alice
 carryctx task list --mine
 ```
 
@@ -63,10 +63,10 @@ carryctx task list --mine
 | Flag | Description |
 | --- | --- |
 | `--status` | Filter to an exact status. |
-| `--owner` | Filter to tasks owned by a given agent name or ULID. |
+| `--assignee` | Filter to tasks owned by a given agent name or ULID. |
 | `--mine` | Only show tasks owned by the current agent (from `--agent` or your configured default agent). |
 
-`--owner` and `--mine` are independent filters; combining them narrows further only if they happen to agree. Use `--format markdown` on the top-level flag to get a Markdown table instead of the compact text lines.
+`--assignee` and `--mine` are independent filters; combining them narrows further only if they happen to agree. Use `--format markdown` on the top-level flag to get a Markdown table instead of the compact text lines.
 
 ```bash
 carryctx task show CTX-0002
@@ -81,7 +81,7 @@ carryctx task edit CTX-0002 --title "Wire reset flow to notification service" --
 carryctx task edit CTX-0002 --description "Revised requirements after the copy review"
 ```
 
-`task edit` touches `--title`, `--priority`, and (since 0.5.4) `--description`; only the flags you pass are changed. There's no flag to change `--owner` or `--status` here, use the dedicated ownership/transition commands below for those.
+`task edit` touches `--title`, `--priority`, and (since 0.5.4) `--description`; only the flags you pass are changed. There's no flag to change `--assignee` or `--status` here, use the dedicated ownership/transition commands below for those.
 
 ## Task lifecycle
 
@@ -173,4 +173,4 @@ Adding a strong dependency to an unowned `ready` task on an incomplete prerequis
 
 ## Referencing tasks
 
-Every command above that takes a task ref accepts either the display ID (`CTX-0001`) or the internal ULID. Same for `--owner`/agent refs: they accept the agent's name or ULID.
+Every command above that takes a task ref accepts either the display ID (`CTX-0001`) or the internal ULID. Same for `--assignee`/agent refs: they accept the agent's name or ULID.

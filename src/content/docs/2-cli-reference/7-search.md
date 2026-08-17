@@ -21,16 +21,16 @@ Searches all four entity kinds and returns hits ranked by relevance (SQLite FTS5
 | `<query>` (positional) | The search text. Supports [FTS5 query syntax](https://www.sqlite.org/fts5.html#full_text_query_syntax): quoted phrases (`"exact phrase"`), boolean operators (`term1 OR term2`), and prefix matches (`retry*`). |
 | `--type <kind>` | Restrict to one entity kind: `task`, `progress`, `checkpoint`, or `decision`. |
 | `--status <status>` | Restrict to hits whose owning task has this exact status (e.g. `in_progress`, `completed`). |
-| `--owner <agent>` | Restrict to hits whose owning task is owned by this agent (name or ULID). |
+| `--assignee <agent>` | Restrict to hits whose owning task is owned by this agent (name or ULID). |
 | `--limit <n>` | Maximum number of hits to return. Defaults to 20. |
 
 ```bash
 carryctx search "retry backoff" --type checkpoint
-carryctx search "auth flow" --status in_progress --owner claude-code
+carryctx search "auth flow" --status in_progress --assignee claude-code
 ```
 
 <Aside type="note">
-`--owner` is deliberately not named `--agent`. The global `--agent`/`CARRYCTX_AGENT` identity flag is defined with `global = true` in the CLI, and a subcommand-local flag with the same name silently inherits its value even when you don't pass it on the command line for that subcommand — the same root cause behind the `event list --agent` bug fixed in 0.2.1. Naming this flag `--owner` avoids the collision outright instead of requiring users to remember a workaround.
+`--assignee` is deliberately not named `--agent`. The global `--agent`/`CARRYCTX_AGENT` identity flag is defined with `global = true` in the CLI, and a subcommand-local flag with the same name silently inherits its value even when you don't pass it on the command line for that subcommand — the same root cause behind the `event list --agent` bug fixed in 0.2.1. Naming this flag `--assignee` avoids the collision outright instead of requiring users to remember a workaround.
 </Aside>
 
 ## What each hit tells you

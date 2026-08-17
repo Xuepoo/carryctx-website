@@ -19,7 +19,7 @@ carryctx task create --title "Add password reset flow"
 | `--title` | 必填，任务的简短标题。 |
 | `--description` | Markdown 格式的任务详细描述。 |
 | `--priority` | `low`、`normal`（默认）、`high` 或 `urgent`。 |
-| `--owner` | 创建时直接指定负责人，可用 agent 名称或 ULID。 |
+| `--assignee` | 创建时直接指定负责人，可用 agent 名称或 ULID。 |
 | `--status` | 强制指定初始状态，而不是让 CarryCtx 自动推导（见下文）。可选值为 `planned`、`ready`、`in_progress`、`blocked`、`review`、`completed`、`cancelled`。 |
 | `--depends-on` | 可重复传入。当前任务依赖的任务引用（显示 ID 或 ULID）。会创建一条 strong（强）依赖边。 |
 
@@ -43,7 +43,7 @@ carryctx task create --title "Wire reset flow to email service" \
 ```bash
 carryctx task list
 carryctx task list --status ready
-carryctx task list --owner alice
+carryctx task list --assignee alice
 carryctx task list --mine
 ```
 
@@ -52,10 +52,10 @@ carryctx task list --mine
 | 参数 | 说明 |
 | --- | --- |
 | `--status` | 按状态精确筛选。 |
-| `--owner` | 按负责人筛选，可用 agent 名称或 ULID。 |
+| `--assignee` | 按负责人筛选，可用 agent 名称或 ULID。 |
 | `--mine` | 只显示当前 agent（由 `--agent` 或配置的默认 agent 决定）负责的任务。 |
 
-`--owner` 和 `--mine` 是两个独立的筛选条件，同时传入只有在两者一致时才会进一步缩小结果。在顶层加上 `--format markdown` 可以拿到 Markdown 表格而不是 JSON/表格输出。
+`--assignee` 和 `--mine` 是两个独立的筛选条件，同时传入只有在两者一致时才会进一步缩小结果。在顶层加上 `--format markdown` 可以拿到 Markdown 表格而不是 JSON/表格输出。
 
 ```bash
 carryctx task show CTX-0002
@@ -70,7 +70,7 @@ carryctx task edit CTX-0002 --title "Wire reset flow to notification service" --
 carryctx task edit CTX-0002 --description "评审后的修订需求"
 ```
 
-`task edit` 支持 `--title`、`--priority` 以及（0.5.4 起）`--description`，只修改你传入的参数。它没有用于修改 `--owner` 或 `--status` 的参数，负责人和状态请使用下面的专门命令来变更。
+`task edit` 支持 `--title`、`--priority` 以及（0.5.4 起）`--description`，只修改你传入的参数。它没有用于修改 `--assignee` 或 `--status` 的参数，负责人和状态请使用下面的专门命令来变更。
 
 ## 任务生命周期
 
@@ -162,4 +162,4 @@ Error: Adding this dependency would create a cycle.
 
 ## 引用任务
 
-上面所有涉及任务引用的命令都可以使用显示 ID（如 `CTX-0001`）或内部 ULID。`--owner` 和 agent 引用同理，可以使用 agent 名称或 ULID。
+上面所有涉及任务引用的命令都可以使用显示 ID（如 `CTX-0001`）或内部 ULID。`--assignee` 和 agent 引用同理，可以使用 agent 名称或 ULID。
