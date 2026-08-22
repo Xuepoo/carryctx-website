@@ -1,11 +1,11 @@
 ---
 title: CarryCtx
-description: Local-first memory for coding agents. Resume tasks, checkpoints, and context across windows, sessions, and worktrees.
+description: Local-first memory for coding agents. Resume tasks, checkpoints, context, and whole agent teams across windows, sessions, and worktrees.
 template: splash
 hero:
   title: |
     Your agent forgets. <span class="text-gradient">CarryCtx</span> doesn't.
-  tagline: A local-first memory layer for coding agents. Resume any task, in any window, on any worktree, with one command.
+  tagline: A local-first memory layer for coding agents and agent teams. Resume any task, in any window, on any worktree, with one command.
   actions:
     - text: Read the Docs
       link: /1-getting-started/1-introduction/
@@ -39,12 +39,16 @@ import Reveal from '../../components/Reveal.astro';
 
 <p class="ctx-lede ctx-reveal">
   CarryCtx is a local-first, Git-native context engine built for coding agents and the humans
-  working alongside them. It lets work continue seamlessly across windows, sessions, and agents.
+  working alongside them. It persists tasks, context, and whole agent teams so work continues
+  seamlessly across windows, sessions, and worktrees.
 </p>
 
 <CardGrid stagger>
   <Card title="100% Offline & Local" icon="approve-check-circle">
     Zero latency. All state lives in `.git/carryctx/state.sqlite`. No cloud account required.
+  </Card>
+  <Card title="Persistent Agent Teams" icon="bars">
+    A roster, a commander, and task assignments that outlive the session. `team context` rebuilds the whole picture read-only.
   </Card>
   <Card title="Git Worktree Aware" icon="code-branch">
     Automatically infers the current branch, worktree, and active task, so context never needs re-declaring across sessions.
@@ -54,6 +58,9 @@ import Reveal from '../../components/Reveal.astro';
   </Card>
   <Card title="Agent Agnostic" icon="rocket">
     Claude Code, OpenCode, Copilot, or a human developer: everyone shares the same structured project memory.
+  </Card>
+  <Card title="A Layer, Not a Framework" icon="database">
+    CarryCtx persists who is on the team and what they know. Your harness spawns, routes, and retries. No scheduler, no runtime.
   </Card>
 </CardGrid>
 
@@ -81,6 +88,7 @@ import Reveal from '../../components/Reveal.astro';
 2. **Claim a task.** Register your agent identity, create or claim a task, and start a session. CarryCtx infers the rest from your current worktree.
 3. **Work normally.** Log `progress`, drop a `checkpoint` before you stop, and let CarryCtx capture the Git diff alongside your notes.
 4. **Resume anywhere.** A new window, a new agent, or a teammate runs `carryctx resume` and picks up exactly where you left off.
+5. **Scale to a team.** Register a roster with `carryctx team`, associate tasks with it, and let a commander read the whole picture back with `carryctx team context`.
 </Steps>
 </div>
 
@@ -115,6 +123,14 @@ import Reveal from '../../components/Reveal.astro';
     # branch feature/csv-export, 2 files dirty.
     ```
   </TabItem>
+  <TabItem label="Team">
+    ```bash
+    carryctx team create --name payments-squad --commander commander-1
+    carryctx team member add payments-squad --agent backend-1 --role backend
+    carryctx task team set CTX-0001 --team payments-squad
+    carryctx team context payments-squad --agent-for backend-1
+    ```
+  </TabItem>
 </Tabs>
 </div>
 
@@ -125,7 +141,8 @@ import Reveal from '../../components/Reveal.astro';
   <LinkCard title="Quickstart" description="Go from zero to your first tracked task in under a minute." href="/1-getting-started/3-quickstart/" />
   <LinkCard title="CLI Reference" description="Every command, from task lifecycle to worktrees and AST graphs." href="/2-cli-reference/1-project-lifecycle/" />
   <LinkCard title="MCP Integration" description="Plug CarryCtx straight into Cursor, Claude Desktop, and other MCP clients." href="/3-ecosystem/2-mcp-server/" />
-  <LinkCard title="Core Concepts" description="Project, Agent, Session, Task, Checkpoint: the five ideas everything else is built on." href="/1-getting-started/2-concepts/" />
+  <LinkCard title="Core Concepts" description="Project, Agent, Team, Session, Task, Checkpoint: the ideas everything else is built on." href="/1-getting-started/2-concepts/" />
+  <LinkCard title="Teams" description="Durable agent rosters, commanders, and the two read-only team projections." href="/2-cli-reference/10-teams/" />
 </CardGrid>
 </div>
 

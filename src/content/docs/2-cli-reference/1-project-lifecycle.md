@@ -1,5 +1,7 @@
 ---
 title: Project & Lifecycle
+sidebar:
+  order: 1
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -76,6 +78,7 @@ Diagnoses and can automatically fix potential issues with the project's SQLite s
 | Flag | Description |
 | --- | --- |
 | `--fix` | Automatically attempt to fix detected anomalies in the database and configuration. |
+| `--prune-stale-worktrees` | Remove registered worktrees whose directories are missing. Never deletes files. Requires `--yes`. |
 | `--json` | Output the diagnostic results in JSON format. |
 
 Each check reports a status of `ok`, `info`, `warning`, or `error`. If any check is `error`, the overall summary is `issues_found` and the process exits with a non-success code; otherwise the summary is `healthy`.
@@ -101,9 +104,19 @@ Everything looks good!
 Any command that opens the project database (including `doctor` itself) transparently applies pending schema migrations first, so an upgrade from an older `carryctx` version self-heals on the next command you run — you don't need to run `project migrate` by hand for this. `doctor`'s `database.schema` check reflects the real state: it reports `error` with the specific pending migration names (and a `carryctx project migrate` fix command) only if migrations somehow couldn't be applied, not merely because a new one exists.
 </Aside>
 
+As of 0.6.0, migrations are safer about that automatic path in two ways. Before applying anything they create and verify a `VACUUM INTO` backup under `<state-dir>/backups/`, so there's always a known-good copy from immediately before the upgrade. And they validate that the applied migration history forms a contiguous prefix of the known migrations, which catches a database that was migrated by a different build rather than applying on top of it.
+
+Separately, every state-changing command now takes a project admission lock for the duration of its write, so two commands can't interleave writes against the same project. The read-only `team status` and `team context` projections skip that lock entirely and can run concurrently with anything.
+
 <Aside type="caution">
 `doctor` does not currently apply repairs beyond schema migrations and what `carryctx init` covers for a missing database; most other `error` checks point you at a fix command (like `carryctx init`) rather than silently mutating state under `--fix`.
 </Aside>
+
+Since 0.6.0 `doctor` also detects **stale worktree registrations**: worktrees still recorded in the database whose directories no longer exist. Detection is part of the ordinary report, but pruning is never implicit — it takes both flags together, so a diagnostic run can't quietly drop registrations:
+
+```bash
+carryctx doctor --prune-stale-worktrees --yes
+```
 
 ## `carryctx project`
 
@@ -117,7 +130,7 @@ Subcommands for administering the project as a whole and the local project regis
 | `unregister <project_id>` | Remove a project from the global registry. |
 | `migrate` | Run database migrations to upgrade the project state schema, reporting the migrations that were applied. |
 | `backup` | Create a portable backup of the project's SQLite state database. |
-| `restore <path>` | Restore the project's SQLite state from a backup file. |
+| `restore <path>` | Restore the project's SQLite state from a backup file, validating the backup first and swapping it in atomically. |
 | `prune [--older-than-days <N>]` | Archive completed tasks updated before `N` days ago to keep the primary database lightweight. Defaults to `30`. Also accepts the alias `--older-than`. |
 
 ```bash
@@ -132,13 +145,15 @@ carryctx project backup
 carryctx project prune --older-than-days 60
 ```
 
+`project restore` is deliberately conservative: it validates the backup file before trusting it, stages the restored database as a candidate alongside the live one, and only then swaps it in atomically. If the process dies partway through, the next run recognizes which phase was interrupted and recovers from there rather than leaving you with a partially written state database.
+
 ## `carryctx agent`
 
 Subcommands for managing the agents registered against a project. An agent has a name, an optional provider, an optional role, and a status of `active` or `deactivated`.
 
 | Subcommand | Description |
 | --- | --- |
-| `register --name <NAME> [--provider <P>] [--role <ROLE>]` | Register a new agent or sync an existing one into the project state. |
+| `register --name <NAME> [--provider <P>] [--role <ROLE>] [--kind commander\|subagent]` | Register a new agent or sync an existing one into the project state. `--kind` (0.6.0+) is nullable metadata describing the agent's execution kind. |
 | `list` | List all agents registered in the project database. |
 | `show <agent_ref>` | Show detailed metadata and history for a specific agent. |
 | `current` | Print the currently active agent based on the environment or global args. |

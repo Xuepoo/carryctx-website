@@ -7,7 +7,7 @@ export default defineConfig({
     starlight({
       title: 'CarryCtx',
       description:
-        'Local-first memory for coding agents — resume tasks, checkpoints, and context across windows, sessions, and worktrees.',
+        'Local-first memory for coding agents — resume tasks, checkpoints, context, and whole agent teams across windows, sessions, and worktrees.',
       defaultLocale: 'root',
       locales: {
         root: { label: 'English', lang: 'en' },

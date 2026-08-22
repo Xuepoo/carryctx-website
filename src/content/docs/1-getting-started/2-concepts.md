@@ -26,6 +26,27 @@ carryctx agent register --name claude-core --provider claude-code --role impleme
 
 Registering an existing name syncs it rather than erroring. `carryctx agent current` prints whichever agent is active for the invocation (resolved from `--agent` or the `CARRYCTX_AGENT` environment variable). `carryctx agent deactivate <ref>` marks an agent inactive so it can no longer be assigned new tasks or sessions; it does not delete history.
 
+Since 0.6.0 an agent also carries an optional `kind` (`commander` or `subagent`), set with `--kind` at registration. It's nullable metadata for the caller's benefit, not a permission boundary.
+
+## Team
+
+A Team (0.6.0+) is a durable, project-scoped roster of agents with an optional commander. Because it lives in the same state database as everything else, it survives the session that created it — new window, new session, or a linked worktree, and the roster is unchanged.
+
+```bash
+carryctx team create --name payments-squad --commander commander-1
+carryctx team member add payments-squad --agent backend-1 --role backend
+```
+
+Two invariants are enforced: a commander must be a member of its own team, and the sitting commander can't be removed until it's replaced or explicitly cleared with `team commander set <ref> --clear`.
+
+Tasks can be associated with a team (`task create --team`, `task team set`, `task team unset`) and can carry an advisory `required_role`. Neither changes lifecycle, ownership, dependencies, or scopes — association is purely additive labelling, and `required_role` gates nothing.
+
+The read side is two projections that open the database read-only and write nothing at all: `carryctx team status` for the roster with per-member active work, and `carryctx team context` for the full picture a commander or member needs, narrowable with `--agent-for` and `--task`.
+
+<Aside type="caution">
+A Team is a persistence and management primitive, not an orchestration one. CarryCtx does not spawn, route, retry, rate-limit, or heartbeat anything — the harness that calls CarryCtx does. An agent may hold several active tasks at once; `task.single_active_task_per_agent` is compatibility-only and does not enforce a limit. See [Teams](/2-cli-reference/10-teams/) for the full command surface.
+</Aside>
+
 ## Session
 
 A Session represents one continuous working period for an agent, bound to a task and (optionally) a worktree. Sessions use a 5-state model:
@@ -86,6 +107,8 @@ carryctx task complete CTX-0001
 
 A newly created task with no unfinished dependencies starts in `ready`; one with unfinished dependencies starts in `planned` (or `--status` can set it explicitly).
 
+A task also has two nullable fields added in 0.6.0: `team_id` (the team it's associated with) and `required_role` (an advisory role label). Neither participates in the state machine above.
+
 ## Checkpoint
 
 A Checkpoint is a persisted snapshot of what an agent has learned about a task's progress at a point in time: what's done, what remains, what's blocking, what risks were identified, and what the next step is, optionally alongside the actual Git diff.
@@ -144,5 +167,5 @@ carryctx event list --task CTX-0001 --limit 20
 ```
 
 <Aside type="note">
-`carryctx resume` and `carryctx context` don't introduce new state, they read across sessions, tasks, checkpoints, progress, and recent events to reconstruct what an agent needs to know. See [Quickstart](/1-getting-started/3-quickstart/) for a full walkthrough.
+`carryctx resume`, `carryctx context`, and the `carryctx team` projections don't introduce new state, they read across sessions, tasks, checkpoints, progress, and recent events to reconstruct what an agent needs to know. See [Quickstart](/1-getting-started/3-quickstart/) for a full walkthrough.
 </Aside>

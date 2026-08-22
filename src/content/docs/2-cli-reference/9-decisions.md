@@ -1,5 +1,7 @@
 ---
 title: Decisions
+sidebar:
+  order: 9
 ---
 
 import { Aside } from '@astrojs/starlight/components';

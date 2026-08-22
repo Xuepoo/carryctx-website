@@ -1,5 +1,7 @@
 ---
 title: 全文搜索
+sidebar:
+  order: 7
 ---
 
 import { Aside } from '@astrojs/starlight/components';

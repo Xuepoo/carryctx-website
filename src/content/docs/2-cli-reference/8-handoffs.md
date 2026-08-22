@@ -1,5 +1,7 @@
 ---
 title: Handoffs
+sidebar:
+  order: 8
 ---
 
 import { Aside } from '@astrojs/starlight/components';

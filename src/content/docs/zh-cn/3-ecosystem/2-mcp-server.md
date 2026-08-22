@@ -53,6 +53,10 @@ carryctx mcp
 
 以下是 `tools/list` 返回的确切工具名和 action 列表。这些 action 列表是权威内容，与 MCP 服务器实际向客户端广播的字符串完全一致。
 
+<Aside type="note">
+截至 0.6.0，[`team`](/zh-cn/2-cli-reference/10-teams/) 命令族还没有专门的 MCP 工具。团队成员管理以及 `team status` / `team context` 投影目前仅通过 CLI 使用。
+</Aside>
+
 ### `carryctx_graph_explorer`
 
 查询、扫描并导出项目的上下文图谱（节点、边、依赖关系、文件间连接）。

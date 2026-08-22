@@ -1,5 +1,7 @@
 ---
 title: 检查点、恢复与上下文
+sidebar:
+  order: 4
 ---
 
 import { Aside } from '@astrojs/starlight/components';

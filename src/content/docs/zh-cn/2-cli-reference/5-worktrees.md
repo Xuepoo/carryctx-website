@@ -1,5 +1,7 @@
 ---
 title: 工作区、任务交接与决策记录
+sidebar:
+  order: 5
 ---
 
 import { Aside } from '@astrojs/starlight/components';

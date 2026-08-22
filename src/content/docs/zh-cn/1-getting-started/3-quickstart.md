@@ -101,7 +101,7 @@ carryctx resume
 
 ```json
 {
-  "schemaVersion": 1,
+  "schema_version": 1,
   "command": "resume",
   "success": true,
   "data": {
@@ -134,7 +134,28 @@ carryctx resume
 
 拿到检查点和进度项之后，新的会话（或新的 agent）就能从上一个会话看到的同一份状态继续工作，不需要重新翻聊天记录。
 
+## 8. 可选：让多个 agent 一起干
+
+如果有多个 agent 在这个仓库里协作，只需注册一次团队，这份名册就会像其他状态一样持久保存：
+
+```bash
+carryctx agent register --name commander-1 --provider claude-code --kind commander
+carryctx team create --name payments-squad --commander commander-1
+carryctx team member add payments-squad --agent claude-core --role backend
+carryctx task team set CTX-0001 --team payments-squad
+```
+
+之后，指挥官只需一次只读调用就能读到团队的完整画面——成员、任务、依赖、阻塞项、决策、交接——并且可以先收窄到某一个成员，再把这一份切片交给它：
+
+```bash
+carryctx team context payments-squad
+carryctx team context payments-squad --agent-for claude-core
+```
+
+这两条命令都不写入任何东西。把工作真正派发给这些 agent 是你的 harness 的职责，不是 CarryCtx 的。
+
 ## 接下来看什么
 
 - [项目生命周期](/zh-cn/2-cli-reference/1-project-lifecycle/) 更深入地介绍了 `init`、`status`、`doctor` 等管理项目本身的命令。
 - [核心概念](/zh-cn/1-getting-started/2-concepts/) 是上文用到的每个状态和转换的参考文档。
+- [团队](/zh-cn/2-cli-reference/10-teams/) 记录了完整的 `team` 命令面，包括两个投影的 JSON 结构。

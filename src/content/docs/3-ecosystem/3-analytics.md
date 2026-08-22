@@ -4,7 +4,7 @@ title: Analytics & Automation
 
 import { Aside } from '@astrojs/starlight/components';
 
-Three commands round out the ecosystem once tasks, checkpoints, and the graph are in regular use: `carryctx stats` for reporting on how work is actually going, `carryctx hooks` for wiring CarryCtx into Git automatically, and `carryctx sync` for the (fully opt-in) case where you want project state to follow you across machines.
+Three commands round out the ecosystem once tasks, checkpoints, and the graph are in regular use: `carryctx stats` for reporting on how work is actually going, `carryctx hooks` for wiring CarryCtx into Git automatically, and `carryctx sync` for the (fully opt-in) case where you want to move project state to or from a directory you choose.
 
 ## `carryctx stats`
 
@@ -106,10 +106,18 @@ carryctx sync push --remote /path/to/shared/backup
 carryctx sync pull --remote /path/to/shared/backup
 ```
 
-`sync push` copies the project's local SQLite database to a file in the given `--remote` directory (default `/tmp/carryctx-remote`, meant to be overridden); `sync pull` copies it back from there into the local project database location. That's the entire mechanism: a raw database file copy to and from a directory you name, no network protocol, no server, no scheduled sync.
+`sync push` publishes a checkpointed `VACUUM INTO` snapshot of the project's SQLite database into the given `--remote` directory (default `/tmp/carryctx-remote`, meant to be overridden); `sync pull` brings it back into the local project database location. That's the entire mechanism: a plain local file copy to and from a directory you name. There is no network protocol, no server, no scheduled sync, and the binary ships no network stack at all — `--remote` is a filesystem path, not a URL.
+
+As of 0.6.0, `sync pull` validates the remote database fully before it replaces anything, and refuses a database belonging to a different project:
+
+```text
+Error: Remote database belongs to a different CarryCtx project.
+```
+
+That failure is reported as `SYNC_PROJECT_MISMATCH`. `pull` also takes a pre-pull backup of the current database and stages the replacement, so an interrupted pull doesn't leave you with a half-written state file.
 
 <Aside type="caution">
-`sync` is never invoked automatically by any other command. CarryCtx is local-first by design (see the [feature comparison](https://github.com/carryctx) on the project's own README: "Leaves your machine: Never — 100% local"), and `sync` is the one deliberate exception you opt into yourself, by running it yourself, pointed at wherever you choose (a mounted network share, an external drive, a syncable cloud folder). There's no default remote and no background process; if you never run `carryctx sync`, no project data ever leaves the machine.
+`sync` is never invoked automatically by any other command, and it does not cross machines or networks by itself: it writes a file to a local path and reads a file from a local path. If that path happens to be a mounted network share, an external drive, or a folder some other tool synchronizes for you, then it's that mount or that tool moving the bytes, not CarryCtx. There's no default remote worth using and no background process; if you never run `carryctx sync`, no project data ever leaves the machine.
 </Aside>
 
 Because `sync pull` overwrites the local database wholesale, treat it as a full-state replace, not a merge: pulling from a remote after making local-only changes discards those local changes in favor of the remote copy.

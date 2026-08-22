@@ -53,6 +53,10 @@ Internally, CarryCtx maps the tool name to a CLI subcommand, appends `--json`, a
 
 These are the exact tool names and action lists returned by `tools/list`. Treat the action lists below as authoritative, they are the same strings the MCP server advertises to a client.
 
+<Aside type="note">
+As of 0.6.0 there is no dedicated MCP tool for the [`team`](/2-cli-reference/10-teams/) command family. Team membership and the `team status` / `team context` projections are CLI-only for now.
+</Aside>
+
 ### `carryctx_graph_explorer`
 
 Query, scan, and export the project Context Graph (nodes, edges, dependencies, file-to-file links).

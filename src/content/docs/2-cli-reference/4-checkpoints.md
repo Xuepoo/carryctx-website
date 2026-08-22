@@ -1,5 +1,7 @@
 ---
 title: Checkpoints, Resume & Context
+sidebar:
+  order: 4
 ---
 
 import { Aside } from '@astrojs/starlight/components';

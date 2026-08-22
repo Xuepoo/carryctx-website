@@ -1,5 +1,7 @@
 ---
 title: 代码依赖图谱
+sidebar:
+  order: 6
 ---
 
 import { Aside } from '@astrojs/starlight/components';

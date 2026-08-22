@@ -1,5 +1,7 @@
 ---
 title: 任务管理 (Task)
+sidebar:
+  order: 2
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -22,6 +24,8 @@ carryctx task create --title "Add password reset flow"
 | `--assignee` | 创建时直接指定负责人，可用 agent 名称或 ULID。 |
 | `--status` | 强制指定初始状态，而不是让 CarryCtx 自动推导（见下文）。可选值为 `planned`、`ready`、`in_progress`、`blocked`、`review`、`completed`、`cancelled`。 |
 | `--depends-on` | 可重复传入。当前任务依赖的任务引用（显示 ID 或 ULID）。会创建一条 strong（强）依赖边。 |
+| `--team` | 要关联的团队引用（名称或 ULID）。参见[团队](/zh-cn/2-cli-reference/10-teams/)。 |
+| `--required-role` | 任务的建议性角色标签，记录为 `required_role`，不拦截任何操作。 |
 
 如果不传 `--status`，CarryCtx 会自动推导：没有未完成依赖的任务初始状态为 `ready`；存在未完成依赖的任务初始状态为 `planned`。如果任务还有未完成的强依赖，强行指定 `--status ready` 会被拒绝，返回冲突错误。
 
@@ -70,7 +74,14 @@ carryctx task edit CTX-0002 --title "Wire reset flow to notification service" --
 carryctx task edit CTX-0002 --description "评审后的修订需求"
 ```
 
-`task edit` 支持 `--title`、`--priority` 以及（0.5.4 起）`--description`，只修改你传入的参数。它没有用于修改 `--assignee` 或 `--status` 的参数，负责人和状态请使用下面的专门命令来变更。
+`task edit` 支持 `--title`、`--priority`、（0.5.4 起）`--description` 以及（0.6.0 起）`--required-role`，只修改你传入的参数。它没有用于修改 `--assignee` 或 `--status` 的参数，负责人和状态请使用下面的专门命令来变更。团队关联有自己的子命令：
+
+```bash
+carryctx task team set CTX-0002 --team payments-squad
+carryctx task team unset CTX-0002
+```
+
+`task team set` 传 `--team none` 等同于 `task team unset`。把任务关联到团队不会改变它的状态、归属、依赖或 scope——参见[团队](/zh-cn/2-cli-reference/10-teams/)。
 
 ## 任务生命周期
 

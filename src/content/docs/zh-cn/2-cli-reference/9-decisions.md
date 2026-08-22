@@ -1,5 +1,7 @@
 ---
 title: 决策记录 (Decision)
+sidebar:
+  order: 9
 ---
 
 import { Aside } from '@astrojs/starlight/components';

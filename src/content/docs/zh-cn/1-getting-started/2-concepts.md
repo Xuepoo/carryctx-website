@@ -26,6 +26,27 @@ carryctx agent register --name claude-core --provider claude-code --role impleme
 
 用已存在的名字重新注册会同步该 agent，而不会报错。`carryctx agent current` 打印当前调用所解析出的活跃 agent（从 `--agent` 或 `CARRYCTX_AGENT` 环境变量解析）。`carryctx agent deactivate <ref>` 把某个 agent 标记为不活跃，使其不能再被分配新任务或会话，但不会删除历史记录。
 
+从 0.6.0 起，agent 还带有一个可选的 `kind`（`commander` 或 `subagent`），在注册时用 `--kind` 指定。它是给调用方参考的可空元数据，不是权限边界。
+
+## Team（团队）
+
+Team（0.6.0 起）是一份持久化的、项目级的 agent 名册，可以有一位指挥官（commander）。因为它和其他一切存放在同一个状态数据库中，所以比创建它的那次会话活得更久——换窗口、换会话，或者进入关联的 worktree，名册都不会变。
+
+```bash
+carryctx team create --name payments-squad --commander commander-1
+carryctx team member add payments-squad --agent backend-1 --role backend
+```
+
+有两条不变式由系统强制：指挥官必须是本团队的成员；在任的指挥官在被替换、或通过 `team commander set <ref> --clear` 显式清空之前，不能被移出团队。
+
+任务可以关联到团队（`task create --team`、`task team set`、`task team unset`），也可以带一个建议性的 `required_role`。两者都不会改变生命周期、归属、依赖或 scope——关联纯粹是附加的标签，而 `required_role` 不拦截任何操作。
+
+读取侧是两个只读投影，它们以只读方式打开数据库并且完全不写入任何东西：`carryctx team status` 给出名册及每个成员当前的活跃工作，`carryctx team context` 给出指挥官或成员所需的完整画面，可用 `--agent-for` 和 `--task` 收窄。
+
+<Aside type="caution">
+Team 是持久化与管理的原语，不是编排原语。CarryCtx 不会拉起进程、不会分派、不会重试、不会限流、也不会做心跳——这些由调用 CarryCtx 的 harness 负责。一个 agent 可以同时持有多个活跃任务；`task.single_active_task_per_agent` 仅为兼容性保留，并不强制任何上限。完整命令面见[团队](/zh-cn/2-cli-reference/10-teams/)。
+</Aside>
+
 ## Session（会话）
 
 Session 表示某个 agent 一段连续的工作周期，绑定到一个任务和（可选的）一个 worktree。Session 采用 5 状态模型：
@@ -86,6 +107,8 @@ carryctx task complete CTX-0001
 
 一个新创建的、没有未完成依赖的任务默认进入 `ready` 状态；如果有未完成的依赖，则进入 `planned` 状态（也可以用 `--status` 显式指定）。
 
+任务还有两个 0.6.0 新增的可空字段：`team_id`（关联的团队）和 `required_role`（建议性的角色标签）。两者都不参与上面的状态机。
+
 ## Checkpoint（检查点）
 
 Checkpoint 是某个时间点上 agent 对任务进展的持久化快照：完成了什么、还剩什么、被什么阻塞、识别出了哪些风险、下一步是什么，还可以附带实际的 Git diff。
@@ -144,5 +167,5 @@ carryctx event list --task CTX-0001 --limit 20
 ```
 
 <Aside type="note">
-`carryctx resume` 和 `carryctx context` 不会产生新的状态，它们跨会话、任务、检查点、进度和最近事件读取信息，重建出 agent 需要知道的内容。完整流程见[快速开始](/zh-cn/1-getting-started/3-quickstart/)。
+`carryctx resume`、`carryctx context` 以及 `carryctx team` 的两个投影都不会产生新的状态，它们跨会话、任务、检查点、进度和最近事件读取信息，重建出 agent 需要知道的内容。完整流程见[快速开始](/zh-cn/1-getting-started/3-quickstart/)。
 </Aside>

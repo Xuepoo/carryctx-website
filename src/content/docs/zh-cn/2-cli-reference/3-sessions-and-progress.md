@@ -1,5 +1,7 @@
 ---
 title: 进度追踪
+sidebar:
+  order: 3
 ---
 
 import { Aside } from '@astrojs/starlight/components';

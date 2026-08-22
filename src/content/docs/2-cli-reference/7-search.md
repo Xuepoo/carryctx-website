@@ -1,5 +1,7 @@
 ---
 title: Full-Text Search
+sidebar:
+  order: 7
 ---
 
 import { Aside } from '@astrojs/starlight/components';

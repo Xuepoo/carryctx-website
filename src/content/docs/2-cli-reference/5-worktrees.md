@@ -1,5 +1,7 @@
 ---
 title: Worktrees, Handoffs, and Decisions
+sidebar:
+  order: 5
 ---
 
 import { Aside } from '@astrojs/starlight/components';

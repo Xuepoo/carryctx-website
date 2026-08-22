@@ -4,7 +4,7 @@ title: 分析与自动化
 
 import { Aside } from '@astrojs/starlight/components';
 
-当任务、检查点和图谱都进入日常使用之后，还有三个命令补齐了整套生态：`carryctx stats` 用于报告实际的工作进展，`carryctx hooks` 用于把 CarryCtx 自动接入 Git，`carryctx sync` 则用于（完全可选地）让项目状态跟随你在多台机器间移动。
+当任务、检查点和图谱都进入日常使用之后，还有三个命令补齐了整套生态：`carryctx stats` 用于报告实际的工作进展，`carryctx hooks` 用于把 CarryCtx 自动接入 Git，`carryctx sync` 则用于（完全可选地）把项目状态搬到你自己指定的目录，或从该目录搬回来。
 
 ## `carryctx stats`
 
@@ -106,10 +106,18 @@ carryctx sync push --remote /path/to/shared/backup
 carryctx sync pull --remote /path/to/shared/backup
 ```
 
-`sync push` 把项目本地的 SQLite 数据库复制到 `--remote` 指定目录下的一个文件中（默认为 `/tmp/carryctx-remote`，建议自行覆盖）；`sync pull` 则把它从那里复制回本地项目数据库所在位置。整个机制仅此而已：对着你指定的目录做一次原始数据库文件复制，没有网络协议、没有服务端、也没有定时同步。
+`sync push` 会把项目 SQLite 数据库经过 checkpoint 的 `VACUUM INTO` 快照发布到 `--remote` 指定的目录下（默认为 `/tmp/carryctx-remote`，建议自行覆盖）；`sync pull` 则把它取回本地项目数据库所在位置。整个机制仅此而已：对着你指定的目录做一次普通的本地文件复制。没有网络协议、没有服务端、没有定时同步，二进制里根本不含任何网络栈——`--remote` 是文件系统路径，不是 URL。
+
+从 0.6.0 起，`sync pull` 会在替换任何内容之前完整校验远端数据库，并拒绝属于其他项目的数据库：
+
+```text
+Error: Remote database belongs to a different CarryCtx project.
+```
+
+该失败以 `SYNC_PROJECT_MISMATCH` 报告。`pull` 还会先对当前数据库做一次 pull 前备份，并以暂存方式完成替换，因此中断的 pull 不会留下一个写坏一半的状态文件。
 
 <Aside type="caution">
-`sync` 从不会被任何其他命令自动调用。CarryCtx 在设计上是本地优先的（参见项目 README 中的功能对比：「离开本机：从不 —— 100% 本地」），`sync` 是你唯一需要主动选择开启的例外：由你亲自运行，指向你自己选定的位置（挂载的网络共享、外部硬盘、可同步的云文件夹）。没有默认远端，也没有后台进程；只要你从不运行 `carryctx sync`，项目数据就永远不会离开这台机器。
+`sync` 从不会被任何其他命令自动调用，它本身也不跨机器、不走网络：它只是往一个本地路径写文件，再从一个本地路径读文件。如果那个路径恰好是挂载的网络共享、外部硬盘，或者由别的工具替你同步的文件夹，那么搬运字节的是那个挂载点或那个工具，而不是 CarryCtx。没有值得使用的默认远端，也没有后台进程；只要你从不运行 `carryctx sync`，项目数据就永远不会离开这台机器。
 </Aside>
 
 由于 `sync pull` 是整体覆盖本地数据库，应当把它当作「整体状态替换」而非「合并」：在有本地专属改动的情况下从远端拉取，会用远端副本丢弃掉这些本地改动。

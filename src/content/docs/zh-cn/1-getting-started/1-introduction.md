@@ -14,6 +14,12 @@ CarryCtx 是一个本地优先（local-first）的 CLI，它给编码 agent 提�
 carryctx resume
 ```
 
+从 0.6.0 起，这份记忆覆盖的不再只是单个 agent。**Team**（团队）——一份 agent 名册、一位可选的指挥官（commander），以及与之关联的任务——和其他一切存放在同一个数据库中，因此「这个团队里有谁、每个人在做什么、这一位现在需要知道什么」不会随着建立它的那次会话一起消失。指挥官 agent 只需一次只读调用就能重建全貌：
+
+```bash
+carryctx team context payments-squad
+```
+
 ## CarryCtx 到底是什么
 
 CarryCtx 不是某个 LLM 的封装层，它不会和任何模型提供商通信。它是一个由 SQLite 支撑的、确定性的状态机，以纯粹的 CLI 形式被调用。它有三个决定性的特征：
@@ -24,7 +30,7 @@ CarryCtx 不是某个 LLM 的封装层，它不会和任何模型提供商通信
 
 ## 适合谁用
 
-CarryCtx 正是针对上面描述的那些失效场景设计的：一个跨越多次会话、单个上下文窗口装不下的长任务，多个 agent（或者一个人和一个 agent）交替接管同一个任务，以及在同一个仓库的多个 Git worktree 上并行推进的工作。如果你的工作总能一次坐下来、一个 agent 就搞定，并且从不丢失思路，那你并不需要它。如果你经常发现自己在每次会话开始时都要重新解释"我们之前在做什么"，这一层正是用来去掉这个步骤的。
+CarryCtx 正是针对上面描述的那些失效场景设计的：一个跨越多次会话、单个上下文窗口装不下的长任务，多个 agent（或者一个人和一个 agent）交替接管同一个任务，在同一个仓库的多个 Git worktree 上并行推进的工作，以及一支长期存在的 agent 队伍——它的名册和分工不应该每次都在 prompt 里重新交代一遍。如果你的工作总能一次坐下来、一个 agent 就搞定，并且从不丢失思路，那你并不需要它。如果你经常发现自己在每次会话开始时都要重新解释"我们之前在做什么"，这一层正是用来去掉这个步骤的。
 
 ## 核心理念：Git 管代码，CarryCtx 管意图
 
@@ -34,6 +40,15 @@ Git 非常擅长记录代码在历史上每个时间点的样子。但它不是�
 - CarryCtx 是"代码为什么会是现在这样"的唯一真相来源：哪个任务是活跃的、已经尝试过什么、还剩什么没做、谁在负责，以及过程中做出了哪些决策。
 
 因为这两层不重叠，你可以在任何已有的 Git 仓库上运行 `carryctx init` 而不会打扰任何东西，也可以随时停止使用 CarryCtx 而不会破坏你的 Git 历史。
+
+## 它是管理层，不是编排框架
+
+有了团队之后，这个区分变得更重要，因为「多 agent」往往让人以为是一个负责运行 agent 的框架。CarryCtx 不是。两者的分工是：
+
+- **CarryCtx 负责持久化的那些答案。** 这个团队里有谁、指挥官是谁、每个成员在做什么、哪里被阻塞、做过哪些决策，以及某个成员此刻需要知道什么。全部存在 SQLite 里，每次窗口关闭之后依然在那里。
+- **你的 harness 负责执行。** 拉起进程、把工作分派给某个成员、重试、并发上限、创建 worktree、心跳、模型选择。这些 CarryCtx 一概不插手。
+
+具体地说，0.6.0 不包含调度器、不包含 worker 运行时、不包含 lease 或心跳机制、不包含 prompt 缓存，也不包含 token 优化器。`carryctx team context` 只负责把团队的准确画面交给指挥官；拿到这幅画面之后怎么决策、以及真正把工作派发出去，都在 CLI 之外。CarryCtx 不运行任何人的 agent。
 
 ## 它在你的工作流中处于什么位置
 
@@ -48,6 +63,7 @@ Git 非常擅长记录代码在历史上每个时间点的样子。但它不是�
 | `init`       | 在仓库中初始化 CarryCtx 并写出 `.carryctx/config.toml`                                                        |
 | `status`     | 项目全景：活动任务、会话、agent、worktree 一览                                                                |
 | `task`       | 带状态、优先级、归属和依赖关系的结构化工作单元，而不是一份散文式待办清单                                      |
+| `team`       | 持久化的 agent 名册：成员关系、可选的指挥官、任务关联，以及只读的团队投影                                     |
 | `progress`   | 挂在某个任务下的微进度日志：todo、blocker、risk、note                                                         |
 | `session`    | 明确的会话生命周期：start / pause / resume / end                                                              |
 | `checkpoint` | 具备 Git 感知能力的状态快照：完成了什么、还剩什么、被什么阻塞、下一步是什么                                   |
@@ -63,7 +79,7 @@ Git 非常擅长记录代码在历史上每个时间点的样子。但它不是�
 | `stats`      | agent 表现分析：会话时长、产出效率                                                                            |
 | `skill`      | 安装和管理可执行的 agent skill（来自本地路径或仓库）                                                          |
 | `preset`     | 安装并应用可复用的能力包：工作流 SOP、编码规则、agent 人格                                                    |
-| `sync`       | 与远程存储同步项目状态                                                                                        |
+| `sync`       | 把状态数据库复制到你指定的本地目录，或从该目录复制回来。没有网络栈，也没有服务端                              |
 | `hooks`      | 安装 Git hook（`post-commit`、`prepare-commit-msg`）实现自动打检查点和任务 ID 前缀的 commit message           |
 | `doctor`     | 诊断并可修复项目健康问题：孤儿任务、缺失的 hook、数据库漂移                                                   |
 | `search`     | 跨 Task、Progress、Checkpoint、Decision 的全文搜索，按相关度排序                                              |
@@ -78,5 +94,6 @@ Git 非常擅长记录代码在历史上每个时间点的样子。但它不是�
 
 ## 接下来看什么
 
-- [核心概念](/zh-cn/1-getting-started/2-concepts/) 精确定义了 Project、Agent、Session、Task、Checkpoint 等构建块，包括它们的状态机。
+- [核心概念](/zh-cn/1-getting-started/2-concepts/) 精确定义了 Project、Agent、Team、Session、Task、Checkpoint 等构建块，包括它们的状态机。
 - [快速开始](/zh-cn/1-getting-started/3-quickstart/) 完整演示了从初始化项目、创建并认领任务，到恢复会话的全流程。
+- [团队](/zh-cn/2-cli-reference/10-teams/) 讲解 `team` 命令族：成员管理、指挥官、任务关联，以及两个只读投影。

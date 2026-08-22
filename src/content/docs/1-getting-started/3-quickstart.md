@@ -101,7 +101,7 @@ With no `--task`/`--session` flags, `resume` finds the most recently active sess
 
 ```json
 {
-  "schemaVersion": 1,
+  "schema_version": 1,
   "command": "resume",
   "success": true,
   "data": {
@@ -134,7 +134,28 @@ Useful flags on `resume`:
 
 With the checkpoint and progress items in hand, the new session (or agent) restarts work with the same picture the previous one had, no re-reading of chat logs required.
 
+## 8. Optional: put more than one agent on it
+
+If several agents work this repository, register them as a team once and the roster persists like everything else:
+
+```bash
+carryctx agent register --name commander-1 --provider claude-code --kind commander
+carryctx team create --name payments-squad --commander commander-1
+carryctx team member add payments-squad --agent claude-core --role backend
+carryctx task team set CTX-0001 --team payments-squad
+```
+
+From then on, a commander reads the team's whole picture — members, tasks, dependencies, blockers, decisions, handoffs — in one read-only call, and can narrow it to a single member before handing that slice to them:
+
+```bash
+carryctx team context payments-squad
+carryctx team context payments-squad --agent-for claude-core
+```
+
+Neither command writes anything. Dispatching the work to those agents is your harness's job, not CarryCtx's.
+
 ## Next steps
 
 - [Project Lifecycle](/2-cli-reference/1-project-lifecycle/) covers `init`, `status`, `doctor`, and the other commands that manage the project itself in more depth.
 - [Core Concepts](/1-getting-started/2-concepts/) is the reference for every state and transition used above.
+- [Teams](/2-cli-reference/10-teams/) documents the full `team` surface, including the JSON shape of both projections.

@@ -1,5 +1,7 @@
 ---
 title: Code Dependency Graph
+sidebar:
+  order: 6
 ---
 
 import { Aside } from '@astrojs/starlight/components';

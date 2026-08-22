@@ -1,5 +1,7 @@
 ---
 title: Progress Tracking
+sidebar:
+  order: 3
 ---
 
 import { Aside } from '@astrojs/starlight/components';

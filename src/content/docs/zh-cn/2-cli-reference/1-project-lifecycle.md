@@ -1,5 +1,7 @@
 ---
 title: 项目与生命周期
+sidebar:
+  order: 1
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -76,6 +78,7 @@ carryctx status --since 24h --compact
 | 参数 | 说明 |
 | --- | --- |
 | `--fix` | 自动尝试修复数据库和配置中检测到的异常。 |
+| `--prune-stale-worktrees` | 移除目录已不存在的 worktree 注册记录。不会删除任何文件。需配合 `--yes`。 |
 | `--json` | 以 JSON 格式输出诊断结果。 |
 
 每一项检查会报告 `ok`、`info`、`warning` 或 `error` 状态。只要有任意一项为 `error`,总体摘要就是 `issues_found`,进程会以非成功状态码退出;否则摘要为 `healthy`。
@@ -101,9 +104,19 @@ Everything looks good!
 任何会打开项目数据库的命令(包括 `doctor` 本身)都会先透明地应用待处理的 schema 迁移,所以从旧版本的 `carryctx` 升级后,运行下一条命令就会自动修复,不需要手动执行 `project migrate`。`doctor` 的 `database.schema` 检查反映的是真实状态:只有在迁移确实无法应用时才会报 `error`(并给出具体缺失的迁移名和 `carryctx project migrate` 修复命令),而不是仅仅因为存在新迁移就报错。
 </Aside>
 
+从 0.6.0 起,这条自动路径在两个方面变得更稳妥。应用任何迁移之前,它会在 `<state-dir>/backups/` 下创建并校验一份 `VACUUM INTO` 备份,因此总有一份升级前的已知良好副本。同时它会校验已应用的迁移历史构成已知迁移的连续前缀,从而识别出被另一个构建版本迁移过的数据库,而不是继续往上叠加。
+
+另外,现在每一个会修改状态的命令在写入期间都会持有项目准入锁,因此两个命令不会对同一项目交错写入。只读的 `team status` 与 `team context` 投影完全跳过该锁,可以与任何命令并发运行。
+
 <Aside type="caution">
 目前 `doctor` 除了 schema 迁移以及针对缺失数据库指向 `carryctx init` 之外,并不会自动执行更多修复;大多数其他 `error` 检查会给出一条修复命令(比如 `carryctx init`),而不是在 `--fix` 下静默改动状态。
 </Aside>
+
+从 0.6.0 起,`doctor` 还会检测**过期的 worktree 注册记录**:数据库里仍有记录、但目录已经不存在的 worktree。检测本身是常规报告的一部分,但清理绝不会隐式发生——必须同时给出两个参数,因此一次诊断运行不会悄悄丢掉注册记录:
+
+```bash
+carryctx doctor --prune-stale-worktrees --yes
+```
 
 ## `carryctx project`
 
@@ -117,7 +130,7 @@ Everything looks good!
 | `unregister <project_id>` | 从全局注册表中移除某个项目。 |
 | `migrate` | 运行数据库迁移以升级项目状态 schema,并报告实际应用的迁移。 |
 | `backup` | 为项目的 SQLite 状态数据库创建一份可移植的备份。 |
-| `restore <path>` | 从备份文件恢复项目的 SQLite 状态。 |
+| `restore <path>` | 从备份文件恢复项目的 SQLite 状态,恢复前先校验备份,并以原子方式换入。 |
 | `prune [--older-than-days <N>]` | 归档在 `N` 天之前更新过的已完成任务,以保持主数据库轻量,默认为 `30`。同时支持别名 `--older-than`。 |
 
 ```bash
@@ -132,13 +145,15 @@ carryctx project backup
 carryctx project prune --older-than-days 60
 ```
 
+`project restore` 的设计是刻意保守的:它先校验备份文件再决定是否信任它,把恢复出的数据库作为候选暂存在正在使用的数据库旁边,然后才以原子方式换入。如果进程中途终止,下一次运行会识别出被打断的阶段并从那里恢复,而不是留下一个写坏一半的状态数据库。
+
 ## `carryctx agent`
 
 用于管理项目中注册的 agent 的子命令。一个 agent 拥有名称、可选的 provider、可选的 role,以及 `active` 或 `deactivated` 状态。
 
 | 子命令 | 说明 |
 | --- | --- |
-| `register --name <NAME> [--provider <P>] [--role <ROLE>]` | 注册一个新 agent,或将已存在的 agent 同步到项目状态中。 |
+| `register --name <NAME> [--provider <P>] [--role <ROLE>] [--kind commander\|subagent]` | 注册一个新 agent,或将已存在的 agent 同步到项目状态中。`--kind`(0.6.0 起)是描述 agent 执行类型的可空元数据。 |
 | `list` | 列出项目数据库中所有已注册的 agent。 |
 | `show <agent_ref>` | 显示指定 agent 的详细元数据与历史记录。 |
 | `current` | 根据环境变量或全局参数打印当前活跃的 agent。 |

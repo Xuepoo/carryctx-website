@@ -1,5 +1,7 @@
 ---
 title: Task Management
+sidebar:
+  order: 2
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -22,6 +24,8 @@ Flags on `task create`:
 | `--assignee` | Agent name or ULID to assign the task to on creation. |
 | `--status` | Force the initial status instead of letting CarryCtx derive it (see below). Accepts `planned`, `ready`, `in_progress`, `blocked`, `review`, `completed`, `cancelled`. |
 | `--depends-on` | Repeatable. Task ref (display ID or ULID) this task depends on. Creates a strong dependency edge. |
+| `--team` | Team ref (name or ULID) to associate the task with. See [Teams](/2-cli-reference/10-teams/). |
+| `--required-role` | Advisory role label for the task. Recorded as `required_role`; it gates nothing. |
 
 If you don't pass `--status`, CarryCtx picks it for you: a task with no incomplete dependencies starts `ready`; a task with unfinished dependencies starts `planned`. You can't force `--status ready` on a task that has incomplete strong dependencies, the CLI rejects it with a conflict error.
 
@@ -81,7 +85,14 @@ carryctx task edit CTX-0002 --title "Wire reset flow to notification service" --
 carryctx task edit CTX-0002 --description "Revised requirements after the copy review"
 ```
 
-`task edit` touches `--title`, `--priority`, and (since 0.5.4) `--description`; only the flags you pass are changed. There's no flag to change `--assignee` or `--status` here, use the dedicated ownership/transition commands below for those.
+`task edit` touches `--title`, `--priority`, (since 0.5.4) `--description`, and (since 0.6.0) `--required-role`; only the flags you pass are changed. There's no flag to change `--assignee` or `--status` here, use the dedicated ownership/transition commands below for those. Team association has its own subcommands:
+
+```bash
+carryctx task team set CTX-0002 --team payments-squad
+carryctx task team unset CTX-0002
+```
+
+`--team none` on `task team set` is equivalent to `task team unset`. Associating a task with a team never changes its status, ownership, dependencies, or scopes — see [Teams](/2-cli-reference/10-teams/).
 
 ## Task lifecycle
 
