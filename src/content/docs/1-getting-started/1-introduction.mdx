@@ -4,17 +4,19 @@ title: Introduction
 
 import { Aside } from '@astrojs/starlight/components';
 
-Your coding agent forgets everything the moment its window closes. You close Claude Code, or your terminal crashes, or you switch to a different worktree to work on something else. Tomorrow's session, or a teammate's, or a completely different agent, has no idea what you were doing, what's done, what's blocked, or which branch you were on.
+A coding agent team runs on state that nobody holds reliably for long: which tasks exist and why, what depends on what, who owns what right now, and what has already been tried. When a commander plans the work, role-specialized subagents implement it, and reviewers finish it, that intent outgrows any chat window. Commit messages explain patches, not plans. Markdown notes rot the moment someone stops editing them by hand.
 
-Chat history isn't project state. It lives inside a provider's context window, and it disappears the moment that window closes. Commit messages don't explain intent, they explain what changed, not why, or what's left. A hand-written `HANDOFF.md` goes stale the moment you stop updating it by hand, and nobody updates it consistently under deadline pressure.
+Chat history isn't project state. It lives inside a provider's context window and disappears when that window closes, and a hand-written `HANDOFF.md` goes stale under deadline pressure because nobody maintains it consistently.
 
-CarryCtx is a local-first CLI that gives coding agents a real memory: structured tasks, progress logs, decisions, and Git-aware checkpoints, all persisted in a single SQLite file inside your repository. Any agent, in any window, on any worktree, runs one command and picks up exactly where the last one left off:
+CarryCtx is the intent and management layer for AI coding agents. It durably holds **what** the team intends to do — dependency-aware tasks with priorities and workflows; **who** does it — durable teams of a commander plus role-specialized subagents, with handoffs enforced by a state machine; and **what happened** — an append-only event stream, Git-aware checkpoints, immutable decision records, full-text search. Then it serves exactly the slice of that context a given caller needs, over a plain CLI or an MCP server.
+
+Because everything persists locally in a single SQLite file inside your repository, continuity comes with it rather than being the point: any agent, in any window, on any worktree, picks up where the last one left off:
 
 ```bash
 carryctx resume
 ```
 
-Since 0.6.0 that memory covers more than one agent at a time. A **Team** — a roster of agents, an optional commander, and the tasks associated with them — is persisted in the same database as everything else, so "who is on this team, what is each one working on, and what does this one need to know" survives the session that set it up. A commander agent can rebuild the whole picture with one read-only call:
+The unit of persistence is bigger than one agent, too. A **Team** — a roster of agents, an optional commander, and the tasks associated with them — lives in the same database as everything else, so who is on it, what each member is working on, and what this one needs to know are durable, re-readable facts. One read-only call rebuilds the whole picture:
 
 ```bash
 carryctx team context payments-squad
@@ -22,7 +24,7 @@ carryctx team context payments-squad
 
 ## What CarryCtx actually is
 
-CarryCtx is not a wrapper around an LLM and it doesn't talk to any model provider. It's a small, deterministic state machine backed by SQLite, invoked as a plain CLI. It has three defining properties:
+CarryCtx is not a wrapper around an LLM, doesn't talk to any model provider, and runs nobody's agents. It's a small, deterministic state machine backed by SQLite, invoked as a plain CLI. It has three defining properties:
 
 - **Local-first.** No network access by default, no account, no telemetry. State lives in `.git/carryctx/state.sqlite` (technically inside the Git common directory, so every worktree of the same repository shares it), and project config lives in `.carryctx/config.toml` at the repository root.
 - **SQLite-backed.** Tasks, sessions, checkpoints, progress items, decisions, handoffs, and events are all rows in a relational schema. That means they're queryable with `--json`, filterable, and consistent, not free-text notes an agent might paraphrase differently every time.
@@ -30,7 +32,7 @@ CarryCtx is not a wrapper around an LLM and it doesn't talk to any model provide
 
 ## Who this is for
 
-CarryCtx is aimed at exactly the failure modes described above: a long-running task that spans more sessions than one context window can hold, multiple agents (or a human and an agent) trading off ownership of the same task, parallel work across several Git worktrees on the same repository, and a standing group of agents whose roster and assignments shouldn't have to be re-declared in a prompt every time. If your work fits in one sitting with one agent and you never lose the thread, you don't need it. If you routinely find yourself re-explaining "what we were doing" at the start of a session, this is the layer that removes that step.
+CarryCtx is aimed at the point where agent work stops fitting in a prompt: a commander coordinating role-specialized subagents instead of one agent doing everything, long-running tasks that span more sessions than a single context window can hold, several agents (or a human and an agent) trading ownership of the same task, parallel lines of work across multiple Git worktrees of the same repository, and standing teams whose roster and assignments shouldn't have to be re-declared in a prompt every time. If your work fits in one sitting with one agent, you don't need it. If you find yourself re-explaining the plan — or re-briefing a whole team — at the start of every session, this is the layer that removes that step.
 
 ## The core idea: Git owns code, CarryCtx owns intent
 
@@ -48,7 +50,7 @@ This distinction matters more now that teams exist, because "multi-agent" usuall
 - **CarryCtx owns the durable answers.** Who is on this team, who the commander is, what each member is working on, what's blocked, what was decided, and what a given member needs to know right now. All of it in SQLite, all of it still there after every window closes.
 - **Your harness owns execution.** Spawning processes, routing work to a member, retries, concurrency limits, creating worktrees, heartbeats, and model selection. CarryCtx has no opinion about any of it.
 
-Concretely, 0.6.0 ships no scheduler, no worker runtime, no lease or heartbeat machinery, no prompt cache, and no token optimizer. `carryctx team context` hands a commander an accurate picture of its team; deciding what to do with that picture, and actually dispatching the work, stays outside the CLI. Nothing in CarryCtx runs anybody's agents.
+Concretely, 0.7.0 ships no scheduler, no worker runtime, no lease or heartbeat machinery, no prompt cache, and no token optimizer. What it does ship is the durable substrate those harnesses coordinate against: a dependency-gated ready queue, claims and handoffs arbitrated safely under concurrency via compare-and-swap updates, keyset-paginated events, and read-only team projections. `carryctx team context` hands a commander an accurate picture of its team; deciding what to do with that picture, and actually dispatching the work, stays outside the CLI. Nothing in CarryCtx runs anybody's agents.
 
 ## How it fits into your workflow
 
@@ -56,7 +58,7 @@ In practice the CLI shows up at the edges of a working session, not in the middl
 
 ## What you get
 
-Running `carryctx --help` lists the top-level command groups. Each one maps to a concrete piece of the "agent memory" problem:
+Running `carryctx --help` lists the top-level command groups. Each one maps to a concrete piece of holding intent and managing agent work:
 
 | Command      | What it gives you                                                                                                          |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
