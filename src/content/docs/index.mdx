@@ -1,11 +1,11 @@
 ---
 title: CarryCtx
-description: Local-first memory for coding agents. Resume tasks, checkpoints, context, and whole agent teams across windows, sessions, and worktrees.
+description: The intent & management layer for AI coding agents. Durable tasks, agent teams, auditable history — served to every agent over CLI or MCP. Local-first SQLite, fully offline.
 template: splash
 hero:
   title: |
-    Your agent forgets. <span class="text-gradient">CarryCtx</span> doesn't.
-  tagline: A local-first memory layer for coding agents and agent teams. Resume any task, in any window, on any worktree, with one command.
+    The <span class="text-gradient">intent &amp; management</span> layer for your coding agents.
+  tagline: CarryCtx durably holds what your agent team intends to do, who does it, and what happened — then hands every agent, commander or subagent, exactly its slice of the picture over CLI or MCP.
   actions:
     - text: Read the Docs
       link: /1-getting-started/1-introduction/
@@ -31,36 +31,42 @@ import Reveal from '../../components/Reveal.astro';
   </div>
   <div class="ctx-stat">
     <span class="ctx-stat-value">∞</span>
-    <span class="ctx-stat-label">agents, one shared memory</span>
+    <span class="ctx-stat-label">agents, one source of truth</span>
   </div>
 </div>
 
 ## Core Features
 
 <p class="ctx-lede ctx-reveal">
-  CarryCtx is a local-first, Git-native context engine built for coding agents and the humans
-  working alongside them. It persists tasks, context, and whole agent teams so work continues
-  seamlessly across windows, sessions, and worktrees.
+  CarryCtx is a local-first, Git-native intent and management layer for AI coding agents and the humans
+  working alongside them. It keeps the state chat was never designed to hold — the plan, the roster,
+  the record — queryable by any agent with one CLI call.
 </p>
 
 <CardGrid stagger>
   <Card title="100% Offline & Local" icon="approve-check-circle">
-    Zero latency. All state lives in `.git/carryctx/state.sqlite`. No cloud account required.
+    All state lives in `.git/carryctx/state.sqlite`. No cloud service, no account, no lock-in — pull the network cable and nothing breaks.
   </Card>
-  <Card title="Persistent Agent Teams" icon="bars">
-    A roster, a commander, and task assignments that outlive the session. `team context` rebuilds the whole picture read-only.
+  <Card title="Durable Agent Teams" icon="bars">
+    A commander plus role-specialized subagents, persisted like every other fact. Handoffs advance through a state machine with compare-and-swap updates; `team context` reads it all back, read-only.
   </Card>
-  <Card title="Git Worktree Aware" icon="code-branch">
-    Automatically infers the current branch, worktree, and active task, so context never needs re-declaring across sessions.
+  <Card title="Dependency-Gated Tasks" icon="list-format">
+    Tasks carry status, priority, owner, and dependencies. Work stays `planned` until its dependencies complete, and concurrent claims are arbitrated by the database — not by luck.
+  </Card>
+  <Card title="Auditable by Default" icon="open-book">
+    Every transition lands in an append-only event stream, alongside Git-aware checkpoints, immutable decision records, and full-text search across all of it.
+  </Card>
+  <Card title="Per-Task Worktree Isolation" icon="code-branch">
+    Bind a Git worktree to a task so parallel agents on parallel branches never collide, and context resolves from the directory an agent stands in.
   </Card>
   <Card title="AST Dependency Graph" icon="puzzle">
-    Scans code dependencies to give AI spatial awareness, reducing hallucinated cross-file assumptions.
+    Scans imports into a file-level dependency graph, exportable as Mermaid/DOT/ASCII, so agents reason about blast radius instead of hallucinating cross-file assumptions.
   </Card>
-  <Card title="Agent Agnostic" icon="rocket">
-    Claude Code, OpenCode, Copilot, or a human developer: everyone shares the same structured project memory.
+  <Card title="Presets, Skills & Personas" icon="setting">
+    Install workflow SOPs, coding rules, and agent personas into `.carryctx/` — conventions ship with the repository instead of living in prompts.
   </Card>
-  <Card title="A Layer, Not a Framework" icon="database">
-    CarryCtx persists who is on the team and what they know. Your harness spawns, routes, and retries. No scheduler, no runtime.
+  <Card title="Agent Analytics" icon="analytics">
+    `carryctx stats` reports sessions, throughput, checkpoints, and blockers per agent — real numbers for tuning your harness, computed entirely locally.
   </Card>
 </CardGrid>
 
@@ -85,10 +91,10 @@ import Reveal from '../../components/Reveal.astro';
 <div class="ctx-reveal">
 <Steps>
 1. **Initialize once.** `carryctx init` creates a local SQLite store inside your repo's `.git/` directory. Nothing leaves your machine.
-2. **Claim a task.** Register your agent identity, create or claim a task, and start a session. CarryCtx infers the rest from your current worktree.
+2. **Declare the work.** Register your agents, create dependency-linked tasks with priorities, and group them under a team with a commander.
 3. **Work normally.** Log `progress`, drop a `checkpoint` before you stop, and let CarryCtx capture the Git diff alongside your notes.
-4. **Resume anywhere.** A new window, a new agent, or a teammate runs `carryctx resume` and picks up exactly where you left off.
-5. **Scale to a team.** Register a roster with `carryctx team`, associate tasks with it, and let a commander read the whole picture back with `carryctx team context`.
+4. **Resume anywhere.** A new window, a new agent, or a teammate runs `carryctx resume` and continues from the same facts you left behind.
+5. **Dispatch to specialists.** The commander reads `team context`, narrows it with `--agent-for`, and your harness hands each subagent exactly its slice — while CarryCtx keeps enforcing who owns what.
 </Steps>
 </div>
 
@@ -131,6 +137,14 @@ import Reveal from '../../components/Reveal.astro';
     carryctx team context payments-squad --agent-for backend-1
     ```
   </TabItem>
+  <TabItem label="Serve over MCP">
+    ```bash
+    carryctx mcp
+    # Six tools over stdio: task_manager, progress_tracker,
+    # decision_logger, graph_explorer, context_manager,
+    # project_admin.
+    ```
+  </TabItem>
 </Tabs>
 </div>
 
@@ -139,16 +153,16 @@ import Reveal from '../../components/Reveal.astro';
 <div class="ctx-reveal">
 <CardGrid>
   <LinkCard title="Quickstart" description="Go from zero to your first tracked task in under a minute." href="/1-getting-started/3-quickstart/" />
-  <LinkCard title="CLI Reference" description="Every command, from task lifecycle to worktrees and AST graphs." href="/2-cli-reference/1-project-lifecycle/" />
-  <LinkCard title="MCP Integration" description="Plug CarryCtx straight into Cursor, Claude Desktop, and other MCP clients." href="/3-ecosystem/2-mcp-server/" />
+  <LinkCard title="CLI Reference" description="Every command, from dependency-aware task lifecycle to worktrees, graphs, and team projections." href="/2-cli-reference/1-project-lifecycle/" />
+  <LinkCard title="MCP Integration" description="Six stdio tools: plug CarryCtx into Cursor, Claude Desktop, and any other MCP client." href="/3-ecosystem/2-mcp-server/" />
   <LinkCard title="Core Concepts" description="Project, Agent, Team, Session, Task, Checkpoint: the ideas everything else is built on." href="/1-getting-started/2-concepts/" />
-  <LinkCard title="Teams" description="Durable agent rosters, commanders, and the two read-only team projections." href="/2-cli-reference/10-teams/" />
+  <LinkCard title="Teams" description="Commanders, role-tagged members, CAS-safe handoffs, and the two read-only team projections." href="/2-cli-reference/10-teams/" />
 </CardGrid>
 </div>
 
 <div class="ctx-cta ctx-reveal">
-  <h2>Ready to give your agents a memory?</h2>
-  <p>Install CarryCtx, run <code>init</code>, and stop re-explaining your project.</p>
+  <h2>Ready to run your agents on real project state?</h2>
+  <p>Install CarryCtx, run <code>init</code>, and give every agent exactly its slice of the plan.</p>
   <LinkButton href="/1-getting-started/3-quickstart/" icon="right-arrow" variant="primary">Get started</LinkButton>
 </div>
 
