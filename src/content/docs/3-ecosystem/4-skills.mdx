@@ -1,54 +1,46 @@
 ---
-title: Agent Skills & Handoff
+title: Agent Skills
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-CarryCtx ships a collection of **agent skills** — `SKILL.md`-based instruction packs that any supporting agent (Claude Code, Codex, OpenCode, Cursor, Antigravity, Gemini CLI, …) can load. They teach the agent how to use CarryCtx properly: not just _which_ commands exist, but _when_ to run them, in what order, and with what discipline.
+CarryCtx ships a single **agent skill** — a `SKILL.md`-based instruction pack that any supporting agent (Claude Code, Codex, OpenCode, Cursor, Antigravity, Gemini CLI, …) can load. It teaches the agent how to use CarryCtx properly: not just _which_ commands exist, but _when_ to run them, in what order, and with what discipline.
 
-The collection lives in the [`carryctx-skills`](https://github.com/Xuepoo/carryctx-skills) repository and installs with the [Vercel Labs Skills CLI](https://github.com/vercel-labs/skills):
+The skill lives in the [`carryctx-skills`](https://github.com/Xuepoo/carryctx-skills) repository and installs with the [Vercel Labs Skills CLI](https://github.com/vercel-labs/skills):
 
 ```bash
-npx skills add https://github.com/Xuepoo/carryctx-skills --skill carryctx-core -y
-# add others as needed:
-npx skills add https://github.com/Xuepoo/carryctx-skills --skill carryctx-rules -y
-npx skills add https://github.com/Xuepoo/carryctx-skills --skill carryctx-workflows -y
-npx skills add https://github.com/Xuepoo/carryctx-skills --skill carryctx-personas -y
-npx skills add https://github.com/Xuepoo/carryctx-skills --skill carryctx-handoff -y
+npx skills add https://github.com/Xuepoo/carryctx-skills --skill use-carryctx -y
 ```
 
-Or install everything with `npx skills add https://github.com/Xuepoo/carryctx-skills` and select all.
+## `use-carryctx`: the commander entry point
 
-## The skills
+Load it **once per main session**, at the start of any multi-step engineering effort. The skill casts your main-session agent as the **commander**: you plan and verify; subagents implement. The loop:
 
-| Skill                | What it teaches the agent                                                                                         |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `carryctx-core`      | The daily loop: resume context, manage tasks, track progress, save checkpoints, work in worktrees, search history |
-| `carryctx-rules`     | Load and obey project-specific `.carryctx/rules/` before matching work                                            |
-| `carryctx-workflows` | Parse `.carryctx/workflows/` blueprints and break high-level tasks into granular tracked todos                    |
-| `carryctx-personas`  | Adopt `.carryctx/personas/` roles (reviewer, architect, …) and their code styles                                  |
-| `carryctx-handoff`   | Produce a **handoff document** from CarryCtx state and route it with `carryctx handoff`                           |
+1. **Plan** — decompose the goal into tasks with explicit dependencies and scopes. Small one-line fixes stay inline; tightly-coupled work batches to one subagent instead of fanning out.
+2. **Assign** — encode the plan durably so nothing depends on the conversation surviving: `task create --depends-on/--team/--required-role` plus `task scope add` for edit-conflict detection.
+3. **Dispatch** — hand each subagent exactly its slice: a task ID plus `team context --agent-for <sub>` output, ideally isolated in its own Git worktree via `worktree create <TASK_REF>` (`<path>/.worktrees/<task-id>` on branch `carryctx/<task-id>`).
+4. **Accept & verify** — never trust a subagent's self-report. Read state back with `team status`, `team context`, `task show`, and `search`; verify the diff and run the tests yourself before `task complete`.
 
-## `carryctx-handoff`: handing work between agents
+Supporting discipline is baked into the same doctrine: record durably because subagents die silently (`progress todo/note/block/risk`, `checkpoint`, `decision add`); keep your own context lean (`--compact` output, outlines before reads, re-reading `team status` between rounds instead of holding state in conversation); and close what you open — end sessions cleanly and checkpoint before merging branches away.
 
-The newest skill closes the loop between CarryCtx's structured memory and the
-class of problem it can't solve alone: telling the _next_ session _what to do_,
-in what order, with which measurements and traps.
+## Why a single skill?
 
-The division of labour:
+Earlier releases shipped five separate skills covering daily usage, rules, workflows, personas, and handoffs. They are now consolidated into `use-carryctx`:
 
-- **CarryCtx is the record** — queryable tasks, checkpoints, decisions, progress, events.
-- **The handoff document is the entry point** — first commands, task order, `file:line` fix sites, measured evidence, verification standard, traps. It points into CarryCtx by ID instead of restating what the record holds.
+- **One install, one invocation per session.** The commander loop needs all of these capabilities anyway, so there is nothing left to pick between — installing one skill covers the full surface.
+- **Progressive disclosure via bundled references.** The `SKILL.md` keeps the commander doctrine and a verified command quick-reference inline; deep detail lives in `references/` guides that the agent reads on demand when operating in that area:
 
-When a session ends with work remaining, the skill:
+| Reference guide | Read it when… |
+| --- | --- |
+| `references/task-lifecycle.md` | Working with task states, transitions, dependency gating, file scopes |
+| `references/team-coordination.md` | Running teams, read-only projections, dispatch patterns, recording discipline |
+| `references/sessions-and-checkpoints.md` | Managing session lifecycle, stale detection, checkpoint policy |
+| `references/handoffs.md` | Writing and taking over handoffs, routing documents, accept/reject/close |
+| `references/presets-rules-personas.md` | Installing SOPs, domain rules, and personas into `.carryctx/` |
+| `references/troubleshooting.md` | Interpreting error codes, recovery steps, diagnostics |
 
-1. **Gathers state** — `carryctx status`, `task list --status in_progress`, `checkpoint list`, `decision list`, `search` — so the document is built from the record, not from memory.
-2. **Writes the document** — timestamp-first (`YYYY-MM-DDTHHMMSSZ-slug.md`), following the generic [`handoff-prompt`](https://github.com/Xuepoo/handoff-prompt) skill's template: first commands (carryctx-native: `carryctx resume`, `handoff list`), repo state, what is done (cited by checkpoint ID), ordered tasks, verification standard, traps.
-3. **Routes it** — `carryctx handoff create --target <agent-or-role> --task CTX-NNNN --summary "handoff doc: handoff-prompt/<file>.md"`, then `carryctx checkpoint --done … --remaining …`.
-4. **Takes over on the receiving side** — `carryctx handoff list` → read the document → `carryctx resume` → claim the task → record progress as you go → `carryctx handoff accept/close` when done.
-
-This pairs CarryCtx's state machine with the document discipline that keeps long multi-session work measurable: the record answers _what happened_, the document answers _what to do next_.
+Handoffs deserve a special note: when a session ends with unfinished work, the same skill walks you through capturing state into a routed handoff document (`handoff create --target …`) and taking one over on the receiving side (`handoff list` → `handoff accept --claim-task`) — the record answers _what happened_, the document answers _what to do next_.
 
 <Aside type="note">
-The generic `handoff-prompt` skill ([Xuepoo/handoff-prompt](https://github.com/Xuepoo/handoff-prompt)) holds the template and the serial/parallel, reconciliation, and archiving rules. `carryctx-handoff` is the CarryCtx-flavoured workflow around it.
+CarryCtx remains a management and persistence layer, not an orchestration runtime: spawning processes, retries, and concurrency limits belong to you and your harness. The skill teaches doctrine and commands verified against CarryCtx 0.7.0; execution stays with the agent.
 </Aside>

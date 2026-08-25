@@ -1,52 +1,46 @@
 ---
-title: Agent Skills 与 Handoff
+title: Agent 技能
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-CarryCtx 附带一套 **agent skills** —— 基于 `SKILL.md` 的指令包，任何支持的 agent（Claude Code、Codex、OpenCode、Cursor、Antigravity、Gemini CLI……）都能加载。它们教会 agent 正确使用 CarryCtx：不仅是*有哪些*命令，还包括*何时*运行、按什么顺序、遵循什么纪律。
+CarryCtx 附带一个 **agent skill** —— 基于 `SKILL.md` 的指令包，任何支持的 agent（Claude Code、Codex、OpenCode、Cursor、Antigravity、Gemini CLI……）都能加载。它教会 agent 正确使用 CarryCtx：不仅是*有哪些*命令，还包括*何时*运行、按什么顺序、遵循什么纪律。
 
-这套 skill 存放在 [`carryctx-skills`](https://github.com/Xuepoo/carryctx-skills) 仓库中，用 [Vercel Labs Skills CLI](https://github.com/vercel-labs/skills) 安装：
+这个 skill 存放在 [`carryctx-skills`](https://github.com/Xuepoo/carryctx-skills) 仓库中，用 [Vercel Labs Skills CLI](https://github.com/vercel-labs/skills) 安装：
 
 ```bash
-npx skills add https://github.com/Xuepoo/carryctx-skills --skill carryctx-core -y
-# 按需添加其他 skill：
-npx skills add https://github.com/Xuepoo/carryctx-skills --skill carryctx-rules -y
-npx skills add https://github.com/Xuepoo/carryctx-skills --skill carryctx-workflows -y
-npx skills add https://github.com/Xuepoo/carryctx-skills --skill carryctx-personas -y
-npx skills add https://github.com/Xuepoo/carryctx-skills --skill carryctx-handoff -y
+npx skills add https://github.com/Xuepoo/carryctx-skills --skill use-carryctx -y
 ```
 
-或者运行 `npx skills add https://github.com/Xuepoo/carryctx-skills` 后全选安装。
+## `use-carryctx`：指挥官入口
 
-## Skills 一览
+在任何多步骤工程工作开始时，**每个主会话加载一次**。这个 skill 把主会话中的 agent 定位为**指挥官（commander）**：你负责规划与验收，实现全部交给 subagent。循环如下：
 
-| Skill                | 教会 agent 什么                                                                   |
-| -------------------- | --------------------------------------------------------------------------------- |
-| `carryctx-core`      | 日常工作循环：恢复上下文、管理任务、记录进度、保存检查点、worktree 协作、历史搜索 |
-| `carryctx-rules`     | 在匹配的工作开始前，加载并遵守项目专属的 `.carryctx/rules/`                       |
-| `carryctx-workflows` | 解析 `.carryctx/workflows/` 蓝图，把高层任务拆解为可跟踪的 granular todo          |
-| `carryctx-personas`  | 采用 `.carryctx/personas/` 中的角色（reviewer、architect……）及其代码风格          |
-| `carryctx-handoff`   | 从 CarryCtx 状态生成**交接文档**，并用 `carryctx handoff` 路由                    |
+1. **规划** —— 把目标拆解为带显式依赖和范围的任务。一行小修留在主线内做；紧耦合的工作合并给同一个 subagent，而不是强行扇出。
+2. **分派** —— 把计划持久化写入 carryctx，不依赖对话记忆存活：`task create --depends-on/--team/--required-role`，配合 `task scope add` 检测编辑冲突。
+3. **调度** —— 给每个 subagent 恰好它那一片：一个任务 ID 加上 `team context --agent-for <sub>` 的输出，最好用 `worktree create <TASK_REF>` 隔离在独立 Git worktree 中（分支 `carryctx/<task-id>` 上的 `<path>/.worktrees/<task-id>`）。
+4. **验收** —— 绝不相信 subagent 的自我汇报。用 `team status`、`team context`、`task show`、`search` 把状态读回来；自己核对 diff 并跑测试，然后才 `task complete`。
 
-## `carryctx-handoff`：在 agent 之间交接工作
+同一套信条还包含配套纪律：持久化记录，因为 subagent 会无声死掉（`progress todo/note/block/risk`、`checkpoint`、`decision add`）；保持自身上下文精简（`--compact` 输出、先看大纲再读文件、轮次之间重读 `team status` 而不是把状态存在对话里）；以及有始有终——干净地结束会话，合并分支前先保存检查点。
 
-最新的 skill 补齐了 CarryCtx 结构化记忆与它独自解决不了的问题之间的闭环：告诉*下一个*会话*要做什么*、按什么顺序、带着哪些测量数据和陷阱。
+## 为什么只有一个 skill？
 
-分工：
+早期版本附带五个独立的 skill，分别覆盖日常用法、规则、工作流、角色人格和交接。现在它们已合并为 `use-carryctx`：
 
-- **CarryCtx 是记录** —— 可查询的任务、检查点、决策、进度、事件。
-- **交接文档是入口** —— 首命令、任务顺序、`file:line` 修复位置、测量证据、验证标准、陷阱。它按 ID 指向 CarryCtx，而不是重述记录里已有的内容。
+- **一次安装，每会话一次调用。** 指挥官循环本来就需要全部这些能力，所以不再需要挑选组合——装一个 skill 即覆盖完整命令面。
+- **通过内置 references 实现渐进式披露。** `SKILL.md` 只保留指挥官信条和一份经过核验的命令速查表；深入细节放在随包的 `references/` 指南里，agent 在实际操作对应领域时按需阅读：
 
-当会话带着未完成的工作结束时，这个 skill 会：
+| 参考指南 | 什么时候读 |
+| --- | --- |
+| `references/task-lifecycle.md` | 处理任务状态、流转、依赖门控、文件范围 |
+| `references/team-coordination.md` | 运行团队、只读投影、调度模式、记录纪律 |
+| `references/sessions-and-checkpoints.md` | 管理会话生命周期、过期检测、检查点策略 |
+| `references/handoffs.md` | 编写与接管交接、路由文档、accept/reject/close |
+| `references/presets-rules-personas.md` | 把 SOP、领域规则、角色人格安装到 `.carryctx/` |
+| `references/troubleshooting.md` | 解读错误码、恢复步骤、诊断 |
 
-1. **收集状态** —— `carryctx status`、`task list --status in_progress`、`checkpoint list`、`decision list`、`search`，让文档从记录构建，而不是凭记忆。
-2. **写文档** —— 时间戳优先命名（`YYYY-MM-DDTHHMMSSZ-slug.md`），遵循通用 [`handoff-prompt`](https://github.com/Xuepoo/handoff-prompt) skill 的模板：首命令（carryctx 原生：`carryctx resume`、`handoff list`）、仓库状态、已完成内容（按检查点 ID 引用）、有序任务、验证标准、陷阱。
-3. **路由** —— `carryctx handoff create --target <agent-or-role> --task CTX-NNNN --summary "handoff doc: handoff-prompt/<file>.md"`，然后 `carryctx checkpoint --done … --remaining …`。
-4. **接收侧接管** —— `carryctx handoff list` → 读文档 → `carryctx resume` → 认领任务 → 边做边记录进度 → 完成后 `carryctx handoff accept/close`。
-
-这样把 CarryCtx 的状态机与文档纪律结合，让跨多个 session 的长任务始终可度量：记录回答*发生了什么*，文档回答*接下来做什么*。
+交接（handoff）值得单独一提：当会话带着未完成的工作结束时，同一个 skill 会引导你把状态沉淀成一份可路由的交接文档（`handoff create --target …`），并在接收侧接管（`handoff list` → `handoff accept --claim-task`）——记录回答*发生了什么*，文档回答*接下来做什么*。
 
 <Aside type="note">
-通用 `handoff-prompt` skill（[Xuepoo/handoff-prompt](https://github.com/Xuepoo/handoff-prompt)）持有模板以及串行/并行、协调幸存者、归档规则；`carryctx-handoff` 是围绕它的 CarryCtx 风味工作流。
+CarryCtx 始终是一个管理与持久化层，而不是编排运行时：进程派生、重试、并发限制属于你和你的 harness。skill 教的是信条和针对 CarryCtx 0.7.0 核验过的命令；执行仍由 agent 自己完成。
 </Aside>
