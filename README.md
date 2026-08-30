@@ -27,8 +27,8 @@ bun run astro check
 
 ## Documentation
 
-- [English documentation](https://carryctx.dev/)
-- [中文文档](https://carryctx.dev/zh-cn/)
+- [English documentation](https://carryctx.xuepoo.xyz/)
+- [中文文档](https://carryctx.xuepoo.xyz/zh-cn/)
 - [CarryCtx CLI repository](https://github.com/Xuepoo/carryctx)
 - [CarryCtx product specifications](https://github.com/Xuepoo/carryctx-docs)
 
