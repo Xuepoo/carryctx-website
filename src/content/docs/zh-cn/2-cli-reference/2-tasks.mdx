@@ -74,7 +74,7 @@ carryctx task edit CTX-0002 --title "Wire reset flow to notification service" --
 carryctx task edit CTX-0002 --description "评审后的修订需求"
 ```
 
-`task edit` 支持 `--title`、`--priority`、（0.5.4 起）`--description` 以及（0.6.0 起）`--required-role`，只修改你传入的参数。它没有用于修改 `--assignee` 或 `--status` 的参数，负责人和状态请使用下面的专门命令来变更。团队关联有自己的子命令：
+`task edit` 只修改传入的 `--title`、`--priority`、`--description` 和 `--required-role`。终态任务被冻结，只有有效负责人显式使用 `--force` 才能更正，并会追加 `task.corrected` 审计事件。它没有用于修改 `--assignee` 或 `--status` 的参数，负责人和状态请使用专门的转换命令。团队关联有自己的子命令：
 
 ```bash
 carryctx task team set CTX-0002 --team payments-squad

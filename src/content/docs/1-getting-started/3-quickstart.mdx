@@ -4,7 +4,7 @@ title: Quickstart
 
 import { Aside } from '@astrojs/starlight/components';
 
-This walks through the full lifecycle once: initializing a project, registering an agent, creating and claiming a task, running a session, recording progress, and resuming that context in a fresh session. Run it inside an existing Git repository.
+This walks through the lifecycle once: establishing the project contract, planning dependencies, registering roles, creating a task, running a session in a worktree, recording progress, handing off for review, reconciling cleanup, and resuming context. Run it inside an existing Git repository.
 
 ## 1. Initialize the project
 
@@ -52,6 +52,8 @@ carryctx task start CTX-0001
 ```
 
 `task claim` sets you as owner; `task start` moves the status from `ready` to `in_progress` and automatically binds the task to your current context (so subsequent commands can omit `--task`).
+
+For a task that is already `completed` or `cancelled`, ordinary edits are blocked. An authorized owner can make a correction with `carryctx task edit CTX-0001 --title "Corrected title" --force`; the correction is recorded in the audit log.
 
 ## 4. Start a session
 
@@ -153,6 +155,10 @@ carryctx team context payments-squad --agent-for claude-core
 ```
 
 Neither command writes anything. Dispatching the work to those agents is your harness's job, not CarryCtx's.
+
+## 9. Reconcile and release
+
+When work is reviewed and a task is complete, v0.8 can create a persistent cleanup request according to project policy. Run `carryctx worktree cleanup list` to inspect pending or blocked requests and `carryctx worktree cleanup run` to retry safe reconciliation. Dirty worktrees, active sessions, locks, missing paths, and jj-colocated repositories remain visible blockers. Use `carryctx stats` and `carryctx event list` to retain audit and analytics evidence for the release.
 
 ## Next steps
 

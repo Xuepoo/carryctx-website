@@ -42,5 +42,5 @@ npx skills add https://github.com/Xuepoo/carryctx-skills --skill use-carryctx -y
 交接（handoff）值得单独一提：当会话带着未完成的工作结束时，同一个 skill 会引导你把状态沉淀成一份可路由的交接文档（`handoff create --target …`），并在接收侧接管（`handoff list` → `handoff accept --claim-task`）——记录回答*发生了什么*，文档回答*接下来做什么*。
 
 <Aside type="note">
-CarryCtx 始终是一个管理与持久化层，而不是编排运行时：进程派生、重试、并发限制属于你和你的 harness。skill 教的是信条和针对 CarryCtx 0.7.0 核验过的命令；执行仍由 agent 自己完成。
+CarryCtx 始终是生命周期管理与持久化层，而不是编排运行时：进程派生、调度、重试、并发限制属于外部 harness。Skill 针对 CarryCtx 0.8.0 的命令与纪律，帮助 agent 记录契约、规划、进度、检查点、交接、清理与发布证据；实际执行仍由 agent 和 harness 完成。
 </Aside>

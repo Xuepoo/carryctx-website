@@ -6,7 +6,7 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-This page covers the commands that manage a CarryCtx project as a whole: creating it, checking its health, and administering the underlying SQLite state. It assumes you already have a Git repository and have run `carryctx init` at least once.
+This page covers the project lifecycle: establishing a contract, planning dependencies, coordinating roles, running sessions and worktrees, recording progress and evidence, handing work to review, reconciling cleanup, and auditing the result. It assumes an existing Git repository.
 
 ## `carryctx init`
 
@@ -92,7 +92,7 @@ CarryCtx Doctor
 
   ✓ Git repository at /home/user/my-app
   ✓ CarryCtx hooks installed: post-commit, prepare-commit-msg
-  ✓ Database at /home/user/my-app/.git/carryctx/state.db
+  ✓ Database at /home/user/my-app/<git-common-dir>/carryctx/state.sqlite
   ✓ Schema version up to date
   ✓ No orphaned tasks (all owners exist)
   ℹ 1 task(s) currently in progress
@@ -104,7 +104,7 @@ Everything looks good!
 Any command that opens the project database (including `doctor` itself) transparently applies pending schema migrations first, so an upgrade from an older `carryctx` version self-heals on the next command you run — you don't need to run `project migrate` by hand for this. `doctor`'s `database.schema` check reflects the real state: it reports `error` with the specific pending migration names (and a `carryctx project migrate` fix command) only if migrations somehow couldn't be applied, not merely because a new one exists.
 </Aside>
 
-As of 0.6.0, migrations are safer about that automatic path in two ways. Before applying anything they create and verify a `VACUUM INTO` backup under `<state-dir>/backups/`, so there's always a known-good copy from immediately before the upgrade. And they validate that the applied migration history forms a contiguous prefix of the known migrations, which catches a database that was migrated by a different build rather than applying on top of it.
+Before applying migrations, v0.8 creates and verifies a `VACUUM INTO` backup under the state directory's `backups/`; it also validates contiguous migration history before continuing.
 
 Separately, every state-changing command now takes a project admission lock for the duration of its write, so two commands can't interleave writes against the same project. The read-only `team status` and `team context` projections skip that lock entirely and can run concurrently with anything.
 
@@ -112,7 +112,7 @@ Separately, every state-changing command now takes a project admission lock for 
 `doctor` does not currently apply repairs beyond schema migrations and what `carryctx init` covers for a missing database; most other `error` checks point you at a fix command (like `carryctx init`) rather than silently mutating state under `--fix`.
 </Aside>
 
-Since 0.6.0 `doctor` also detects **stale worktree registrations**: worktrees still recorded in the database whose directories no longer exist. Detection is part of the ordinary report, but pruning is never implicit — it takes both flags together, so a diagnostic run can't quietly drop registrations:
+`doctor` detects **stale worktree registrations**. Detection is read-only; pruning is never implicit and requires both flags:
 
 ```bash
 carryctx doctor --prune-stale-worktrees --yes
@@ -153,7 +153,7 @@ Subcommands for managing the agents registered against a project. An agent has a
 
 | Subcommand | Description |
 | --- | --- |
-| `register --name <NAME> [--provider <P>] [--role <ROLE>] [--kind commander\|subagent]` | Register a new agent or sync an existing one into the project state. `--kind` (0.6.0+) is nullable metadata describing the agent's execution kind. |
+| `register --name <NAME> [--provider <P>] [--role <ROLE>] [--kind commander\|subagent]` | Register a new agent or sync an existing one into the project state. `--kind` is nullable metadata describing execution kind. |
 | `list` | List all agents registered in the project database. |
 | `show <agent_ref>` | Show detailed metadata and history for a specific agent. |
 | `current` | Print the currently active agent based on the environment or global args. |

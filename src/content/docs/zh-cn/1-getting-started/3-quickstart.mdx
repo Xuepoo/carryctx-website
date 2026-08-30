@@ -4,7 +4,7 @@ title: 快速开始
 
 import { Aside } from '@astrojs/starlight/components';
 
-本文完整走一遍生命周期：初始化项目、注册 agent、创建并认领任务、开启一个会话、记录进度，最后在一个全新的会话中恢复这份上下文。请在一个已有的 Git 仓库中执行以下步骤。
+本文完整走一遍生命周期：建立项目契约、规划依赖、注册角色、创建任务、在 Worktree 中运行会话、记录进度、交接评审、协调清理，并恢复上下文。请在一个已有的 Git 仓库中执行以下步骤。
 
 ## 1. 初始化项目
 
@@ -52,6 +52,8 @@ carryctx task start CTX-0001
 ```
 
 `task claim` 把你设为 owner；`task start` 把状态从 `ready` 转到 `in_progress`，并自动把该任务绑定到你当前的上下文（后续命令可以省略 `--task`）。
+
+已经处于 `completed` 或 `cancelled` 的任务不能普通编辑。有效的负责人可以使用 `carryctx task edit CTX-0001 --title "修正后的标题" --force` 做更正；这次更正会记录在审计日志中。
 
 ## 4. 开启一个会话
 
@@ -153,6 +155,10 @@ carryctx team context payments-squad --agent-for claude-core
 ```
 
 这两条命令都不写入任何东西。把工作真正派发给这些 agent 是你的 harness 的职责，不是 CarryCtx 的。
+
+## 9. 协调清理并发布
+
+评审完成、任务结束后，v0.8 可以根据项目策略创建持久化清理请求。使用 `carryctx worktree cleanup list` 查看待处理或阻塞请求，用 `carryctx worktree cleanup run` 重试安全协调。脏 Worktree、活跃会话、锁、缺失路径与 jj colocated 仓库会保留为可见阻塞。使用 `carryctx stats` 与 `carryctx event list` 为发布保留审计和统计证据。
 
 ## 接下来看什么
 

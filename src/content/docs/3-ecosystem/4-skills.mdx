@@ -42,5 +42,5 @@ Earlier releases shipped five separate skills covering daily usage, rules, workf
 Handoffs deserve a special note: when a session ends with unfinished work, the same skill walks you through capturing state into a routed handoff document (`handoff create --target …`) and taking one over on the receiving side (`handoff list` → `handoff accept --claim-task`) — the record answers _what happened_, the document answers _what to do next_.
 
 <Aside type="note">
-CarryCtx remains a management and persistence layer, not an orchestration runtime: spawning processes, retries, and concurrency limits belong to you and your harness. The skill teaches doctrine and commands verified against CarryCtx 0.7.0; execution stays with the agent.
+CarryCtx remains a lifecycle management and persistence layer, not an orchestration runtime: spawning processes, scheduling, retries, and concurrency limits belong to the external harness. The skill teaches lifecycle doctrine and commands verified against CarryCtx 0.8.0; scheduling and execution stay with the harness and agent.
 </Aside>

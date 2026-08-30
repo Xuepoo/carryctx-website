@@ -58,7 +58,7 @@ carryctx worktree unbind ../ctx-0001
 按路径或 ID 清除工作区的任务绑定。这只是移除 CarryCtx 内部的关联关系,不会删除目录、移除 Git 工作区,也不会动分支。
 
 <Aside type="caution">
-没有 `carryctx worktree remove` 或 `prune` 子命令。`unbind` 只解除任务绑定;要真正清理检出目录,需要直接使用 Git:`git worktree remove ../ctx-0001`。
+v0.8 增加了持久化清理请求与策略。`worktree cleanup list`、`show`、`run` 会协调安全删除；脏 Worktree、活跃会话、锁、缺失路径与 jj colocated 仓库会作为可见阻塞保留，不会被静默删除。`unbind` 仍然只解除任务绑定。
 </Aside>
 
 ## Handoff(任务交接)

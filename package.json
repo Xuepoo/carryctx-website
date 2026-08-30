@@ -1,7 +1,8 @@
 {
   "name": "carryctx-website",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.8.0",
+  "description": "Astro documentation site for CarryCtx, a local-first project lifecycle manager for coding agents and human collaborators.",
   "engines": {
     "node": ">=22.12.0"
   },

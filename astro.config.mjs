@@ -7,7 +7,7 @@ export default defineConfig({
     starlight({
       title: 'CarryCtx',
       description:
-        'The intent & management layer for AI coding agents — durable tasks, agent teams, auditable history, and exactly-right context over CLI or MCP. Local-first SQLite.',
+        'CarryCtx manages the full project lifecycle for coding agents and human collaborators — from contracts and dependencies through worktrees, handoffs, cleanup, audit, analytics, and release evidence. Local-first and offline.',
       defaultLocale: 'root',
       locales: {
         root: { label: 'English', lang: 'en' },

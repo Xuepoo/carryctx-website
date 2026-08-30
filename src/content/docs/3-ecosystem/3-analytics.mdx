@@ -108,7 +108,7 @@ carryctx sync pull --remote /path/to/shared/backup
 
 `sync push` publishes a checkpointed `VACUUM INTO` snapshot of the project's SQLite database into the given `--remote` directory (default `/tmp/carryctx-remote`, meant to be overridden); `sync pull` brings it back into the local project database location. That's the entire mechanism: a plain local file copy to and from a directory you name. There is no network protocol, no server, no scheduled sync, and the binary ships no network stack at all — `--remote` is a filesystem path, not a URL.
 
-As of 0.6.0, `sync pull` validates the remote database fully before it replaces anything, and refuses a database belonging to a different project:
+In v0.8, `sync pull` validates the local-directory database fully before it replaces anything, and refuses a database belonging to a different project:
 
 ```text
 Error: Remote database belongs to a different CarryCtx project.

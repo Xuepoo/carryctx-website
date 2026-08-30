@@ -57,8 +57,8 @@ carryctx worktree unbind ../ctx-0001
 
 Clears the task binding on a worktree, by path or ID. This only removes the CarryCtx association: it does not delete the directory, remove the Git worktree, or touch the branch.
 
-<Aside type="caution">
-There is no `carryctx worktree remove` or `prune` subcommand. `unbind` only detaches the task; to actually get rid of the checkout, use Git directly: `git worktree remove ../ctx-0001`.
+<Aside type="note">
+v0.8 adds persistent cleanup requests and policies. `worktree cleanup list`, `show`, and `run` reconcile safe removal attempts; dirty worktrees, active sessions, locks, missing paths, and jj-colocated repositories remain observable blockers rather than being silently deleted. `unbind` still only detaches a task.
 </Aside>
 
 ## Handoffs
