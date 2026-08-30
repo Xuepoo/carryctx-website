@@ -1,11 +1,11 @@
 ---
 title: CarryCtx
-description: The intent & management layer for AI coding agents. Durable tasks, agent teams, auditable history — served to every agent over CLI or MCP. Local-first SQLite, fully offline.
+description: "CarryCtx manages the project lifecycle for coding agents and human collaborators: durable plans, dependencies, sessions, handoffs, evidence, and audit history. Local-first and offline."
 template: splash
 hero:
   title: |
-    The <span class="text-gradient">intent &amp; management</span> layer for your coding agents.
-  tagline: CarryCtx durably holds what your agent team intends to do, who does it, and what happened — then hands every agent, commander or subagent, exactly its slice of the picture over CLI or MCP.
+    Manage the <span class="text-gradient">entire project lifecycle</span> around your coding agents.
+  tagline: CarryCtx gives agents and human collaborators one local, auditable control plane from project contract and dependency-aware planning through worktrees, checkpoints, handoffs, reconciliation, and release evidence.
   actions:
     - text: Read the Docs
       link: /1-getting-started/1-introduction/
@@ -37,15 +37,15 @@ import Reveal from '../../components/Reveal.astro';
 
 ## Core Features
 
-<p class="ctx-lede ctx-reveal">
-  CarryCtx is a local-first, Git-native intent and management layer for AI coding agents and the humans
-  working alongside them. It keeps the state chat was never designed to hold — the plan, the roster,
-  the record — queryable by any agent with one CLI call.
+  <p class="ctx-lede ctx-reveal">
+  CarryCtx manages the lifecycle around software delivery for coding agents and human collaborators. It keeps
+  the project contract, plan, dependencies, roles, sessions, progress, review trail, cleanup decisions, and
+  release evidence in one local, Git-aware state model.
 </p>
 
 <CardGrid stagger>
   <Card title="100% Offline & Local" icon="approve-check-circle">
-    All state lives in `.git/carryctx/state.sqlite`. No cloud service, no account, no lock-in — pull the network cable and nothing breaks.
+    State lives at `<git-common-dir>/carryctx/state.sqlite`, shared by linked worktrees. No cloud service, account, or network round-trip is required.
   </Card>
   <Card title="Durable Agent Teams" icon="bars">
     A commander plus role-specialized subagents, persisted like every other fact. Handoffs advance through a state machine with compare-and-swap updates; `team context` reads it all back, read-only.
@@ -64,6 +64,9 @@ import Reveal from '../../components/Reveal.astro';
   </Card>
   <Card title="Presets, Skills & Personas" icon="setting">
     Install workflow SOPs, coding rules, and agent personas into `.carryctx/` — conventions ship with the repository instead of living in prompts.
+  </Card>
+  <Card title="Lifecycle Cleanup & Evidence" icon="approve-check-circle">
+    v0.8 records cleanup requests and policies, reconciles safe worktree removal, and preserves audit and analytics evidence through release.
   </Card>
   <Card title="Agent Analytics" icon="analytics">
     `carryctx stats` reports sessions, throughput, checkpoints, and blockers per agent — real numbers for tuning your harness, computed entirely locally.
@@ -90,11 +93,12 @@ import Reveal from '../../components/Reveal.astro';
 
 <div class="ctx-reveal">
 <Steps>
-1. **Initialize once.** `carryctx init` creates a local SQLite store inside your repo's `.git/` directory. Nothing leaves your machine.
-2. **Declare the work.** Register your agents, create dependency-linked tasks with priorities, and group them under a team with a commander.
-3. **Work normally.** Log `progress`, drop a `checkpoint` before you stop, and let CarryCtx capture the Git diff alongside your notes.
-4. **Resume anywhere.** A new window, a new agent, or a teammate runs `carryctx resume` and continues from the same facts you left behind.
-5. **Dispatch to specialists.** The commander reads `team context`, narrows it with `--agent-for`, and your harness hands each subagent exactly its slice — while CarryCtx keeps enforcing who owns what.
+ 1. **Set the contract.** `carryctx init` records the project configuration and creates state at `<git-common-dir>/carryctx/state.sqlite`.
+  2. **Plan the work.** Create tasks, dependencies, scopes, and a ready queue; let the external harness define and run validation, then record the evidence in checkpoints.
+ 3. **Define roles and teams.** Register humans, commanders, and role-specialized subagents; the external harness decides scheduling.
+ 4. **Run sessions in worktrees.** Bind worktrees, claim tasks, and record progress and Git-aware checkpoints.
+ 5. **Handoff and review.** Transfer ownership explicitly, review the work, and preserve decisions and verification results.
+ 6. **Reconcile and release.** v0.8 cleanup policies safely retry or block worktree removal; audit events and analytics provide release evidence.
 </Steps>
 </div>
 
@@ -153,7 +157,7 @@ import Reveal from '../../components/Reveal.astro';
 <div class="ctx-reveal">
 <CardGrid>
   <LinkCard title="Quickstart" description="Go from zero to your first tracked task in under a minute." href="/1-getting-started/3-quickstart/" />
-  <LinkCard title="CLI Reference" description="Every command, from dependency-aware task lifecycle to worktrees, graphs, and team projections." href="/2-cli-reference/1-project-lifecycle/" />
+  <LinkCard title="CLI Reference" description="Manage the project lifecycle from init and dependencies through cleanup, reconciliation, and release evidence." href="/2-cli-reference/1-project-lifecycle/" />
   <LinkCard title="MCP Integration" description="Six stdio tools: plug CarryCtx into Cursor, Claude Desktop, and any other MCP client." href="/3-ecosystem/2-mcp-server/" />
   <LinkCard title="Core Concepts" description="Project, Agent, Team, Session, Task, Checkpoint: the ideas everything else is built on." href="/1-getting-started/2-concepts/" />
   <LinkCard title="Teams" description="Commanders, role-tagged members, CAS-safe handoffs, and the two read-only team projections." href="/2-cli-reference/10-teams/" />

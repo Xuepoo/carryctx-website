@@ -85,7 +85,7 @@ carryctx task edit CTX-0002 --title "Wire reset flow to notification service" --
 carryctx task edit CTX-0002 --description "Revised requirements after the copy review"
 ```
 
-`task edit` touches `--title`, `--priority`, (since 0.5.4) `--description`, and (since 0.6.0) `--required-role`; only the flags you pass are changed. There's no flag to change `--assignee` or `--status` here, use the dedicated ownership/transition commands below for those. Team association has its own subcommands:
+`task edit` changes only the fields you pass: `--title`, `--priority`, `--description`, and `--required-role`. Terminal tasks (`completed` or `cancelled`) are frozen unless the authorized owner explicitly uses `--force`, which records a `task.corrected` audit event. There is no flag to change `--assignee` or `--status`; use the dedicated ownership/transition commands. Team association has its own subcommands:
 
 ```bash
 carryctx task team set CTX-0002 --team payments-squad

@@ -8,7 +8,7 @@ CarryCtx's state is a set of related records in a SQLite database. This page def
 
 ## Project
 
-A Project corresponds to one Git repository. It's created once with `carryctx init`, which writes `.carryctx/config.toml` at the repository root (project name, task ID prefix, main branch) and creates the state database inside the Git common directory, so every worktree of the repository shares the same project state.
+A Project corresponds to one Git repository and its lifecycle contract. It's created with `carryctx init`, which writes `.carryctx/config.toml` and creates authoritative state at `<git-common-dir>/carryctx/state.sqlite`, shared by every worktree.
 
 ```bash
 carryctx init --name my-app --task-prefix CTX
@@ -26,11 +26,11 @@ carryctx agent register --name claude-core --provider claude-code --role impleme
 
 Registering an existing name syncs it rather than erroring. `carryctx agent current` prints whichever agent is active for the invocation (resolved from `--agent` or the `CARRYCTX_AGENT` environment variable). `carryctx agent deactivate <ref>` marks an agent inactive so it can no longer be assigned new tasks or sessions; it does not delete history.
 
-Since 0.6.0 an agent also carries an optional `kind` (`commander` or `subagent`), set with `--kind` at registration. It's nullable metadata for the caller's benefit, not a permission boundary.
+An agent can carry optional `kind` metadata (`commander` or `subagent`), set with `--kind` at registration. It helps a caller identify roles, but is not a permission boundary.
 
 ## Team
 
-A Team (0.6.0+) is a durable, project-scoped roster of agents with an optional commander. Because it lives in the same state database as everything else, it survives the session that created it — new window, new session, or a linked worktree, and the roster is unchanged.
+A Team is a durable, project-scoped roster of agents with an optional commander. Because it lives in the shared state database, it survives new windows, sessions, and linked worktrees.
 
 ```bash
 carryctx team create --name payments-squad --commander commander-1
@@ -107,7 +107,7 @@ carryctx task complete CTX-0001
 
 A newly created task with no unfinished dependencies starts in `ready`; one with unfinished dependencies starts in `planned` (or `--status` can set it explicitly).
 
-A task also has two nullable fields added in 0.6.0: `team_id` (the team it's associated with) and `required_role` (an advisory role label). Neither participates in the state machine above.
+A task can also carry `team_id` and `required_role` (an advisory role label). Neither participates in the state machine above.
 
 ## Checkpoint
 

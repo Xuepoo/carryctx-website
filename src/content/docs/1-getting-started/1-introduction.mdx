@@ -8,7 +8,7 @@ A coding agent team runs on state that nobody holds reliably for long: which tas
 
 Chat history isn't project state. It lives inside a provider's context window and disappears when that window closes, and a hand-written `HANDOFF.md` goes stale under deadline pressure because nobody maintains it consistently.
 
-CarryCtx is the intent and management layer for AI coding agents. It durably holds **what** the team intends to do — dependency-aware tasks with priorities and workflows; **who** does it — durable teams of a commander plus role-specialized subagents, with handoffs enforced by a state machine; and **what happened** — an append-only event stream, Git-aware checkpoints, immutable decision records, full-text search. Then it serves exactly the slice of that context a given caller needs, over a plain CLI or an MCP server.
+CarryCtx manages the project lifecycle around AI coding agents and human collaborators. It durably holds **what** the project intends to do — contracts, dependency-aware tasks, scopes, priorities, and workflows; **who** does it — durable teams of commanders, role-specialized subagents, and humans; **how work moves** — sessions, worktrees, progress, checkpoints, handoffs, and review; and **what happened** — cleanup and reconciliation records, an append-only event stream, immutable decisions, analytics, and release evidence. It serves exactly the slice a caller needs over a plain CLI or MCP server.
 
 Because everything persists locally in a single SQLite file inside your repository, continuity comes with it rather than being the point: any agent, in any window, on any worktree, picks up where the last one left off:
 
@@ -26,7 +26,7 @@ carryctx team context payments-squad
 
 CarryCtx is not a wrapper around an LLM, doesn't talk to any model provider, and runs nobody's agents. It's a small, deterministic state machine backed by SQLite, invoked as a plain CLI. It has three defining properties:
 
-- **Local-first.** No network access by default, no account, no telemetry. State lives in `.git/carryctx/state.sqlite` (technically inside the Git common directory, so every worktree of the same repository shares it), and project config lives in `.carryctx/config.toml` at the repository root.
+- **Local-first.** No network access by default, no account, no telemetry. State lives at `<git-common-dir>/carryctx/state.sqlite`, so every worktree of the same repository shares it; project config lives in `.carryctx/config.toml` at the repository root.
 - **SQLite-backed.** Tasks, sessions, checkpoints, progress items, decisions, handoffs, and events are all rows in a relational schema. That means they're queryable with `--json`, filterable, and consistent, not free-text notes an agent might paraphrase differently every time.
 - **Agent-agnostic.** CarryCtx doesn't know or care whether the caller is Claude Code, Codex, OpenCode, a human at a terminal, or a CI job. Every caller identifies itself with `--agent`, and every caller reads and writes the same structured state.
 
@@ -43,14 +43,14 @@ Git is extremely good at tracking what the code looked like at every point in hi
 
 Because the two layers don't overlap, you can run `carryctx init` on any existing Git repository without disturbing anything, and you can stop using CarryCtx at any point without corrupting your Git history.
 
-## A management layer, not an orchestration framework
+## Lifecycle control, not process scheduling
 
 This distinction matters more now that teams exist, because "multi-agent" usually implies a framework that runs the agents. CarryCtx doesn't. The split is:
 
 - **CarryCtx owns the durable answers.** Who is on this team, who the commander is, what each member is working on, what's blocked, what was decided, and what a given member needs to know right now. All of it in SQLite, all of it still there after every window closes.
-- **Your harness owns execution.** Spawning processes, routing work to a member, retries, concurrency limits, creating worktrees, heartbeats, and model selection. CarryCtx has no opinion about any of it.
+- **Your external harness owns process execution.** Spawning processes, scheduling and routing calls, retries, concurrency limits, and model selection stay outside CarryCtx. CarryCtx persists the control state those processes coordinate against, including task ownership, dependencies, sessions, worktrees, checkpoints, handoffs, cleanup requests, and audit history.
 
-Concretely, 0.7.0 ships no scheduler, no worker runtime, no lease or heartbeat machinery, no prompt cache, and no token optimizer. What it does ship is the durable substrate those harnesses coordinate against: a dependency-gated ready queue, claims and handoffs arbitrated safely under concurrency via compare-and-swap updates, keyset-paginated events, and read-only team projections. `carryctx team context` hands a commander an accurate picture of its team; deciding what to do with that picture, and actually dispatching the work, stays outside the CLI. Nothing in CarryCtx runs anybody's agents.
+CarryCtx 0.8.0 does not claim a generic Automation Engine or Completion Gates. It provides the durable lifecycle substrate: dependency-gated tasks, CAS-safe claims and handoffs, bounded MCP calls, explicit cleanup policies, task correction with `task edit --force`, keyset-paginated events, and read-only team projections. `jj` colocated repositories are guarded where Git worktree operations or hooks would be unsafe. Nothing in CarryCtx schedules or runs anybody's agents.
 
 ## How it fits into your workflow
 

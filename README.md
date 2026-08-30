@@ -1,43 +1,45 @@
-# Astro Starter Kit: Minimal
+# CarryCtx Website
+
+The CarryCtx website is an Astro and Starlight documentation site for CarryCtx, a local-first project lifecycle manager for coding agents and human collaborators.
+
+The documentation covers the complete delivery loop: project contracts and initialization, dependency-aware planning, roles and teams, sessions and Git worktrees, progress and checkpoints, handoffs and review, cleanup and reconciliation, audit and analytics, and release evidence. It also documents the boundary between CarryCtx's offline persistence and the external harness that schedules agent processes.
+
+## Development
+
+Install dependencies and start the local site:
 
 ```sh
-bun create astro@latest -- --template minimal
+bun install
+bun run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Build the production site:
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```sh
+bun run build
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Run Astro's type/content checks:
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```sh
+bun run astro check
+```
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Documentation
 
-## 🧞 Commands
+- [English documentation](https://carryctx.xuepoo.xyz/)
+- [中文文档](https://carryctx.xuepoo.xyz/zh-cn/)
+- [CarryCtx CLI repository](https://github.com/Xuepoo/carryctx)
+- [CarryCtx product specifications](https://github.com/Xuepoo/carryctx-docs)
 
-All commands are run from the root of the project, from a terminal:
+## Project Structure
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `bun install`             | Installs dependencies                            |
-| `bun dev`             | Starts local dev server at `localhost:4321`      |
-| `bun build`           | Build your production site to `./dist/`          |
-| `bun preview`         | Preview your build locally, before deploying     |
-| `bun astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `bun astro -- --help` | Get help using the Astro CLI                     |
+- `src/content/docs/`: English and Chinese MDX documentation
+- `src/styles/`: shared Starlight customizations
+- `public/`: static assets
+- `astro.config.mjs`: Astro and Starlight configuration
+- `dist/`: generated build output, not source documentation
 
-## 👀 Want to learn more?
+## License
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+This documentation site is distributed under the repository's [MIT License](./LICENSE).

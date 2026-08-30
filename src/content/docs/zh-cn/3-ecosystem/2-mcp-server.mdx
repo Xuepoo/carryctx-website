@@ -12,7 +12,7 @@ import { Aside } from '@astrojs/starlight/components';
 carryctx mcp
 ```
 
-这会启动一个 stdio JSON-RPC 服务器：从标准输入逐行读取 JSON-RPC 请求，逐行向标准输出写回响应。没有其他传输方式（没有 HTTP，没有 socket）；接受一个 `--stdio` 标志是为了兼容那些总是会传这个参数的客户端，但它本身没有任何效果，因为 stdio 已经是唯一的模式。
+这会启动一个 stdio JSON-RPC 服务器：从标准输入逐行读取 JSON-RPC 请求，逐行向标准输出写回响应。没有其他传输方式（没有 HTTP，没有 socket）；接受一个 `--stdio` 标志是为了兼容那些总是会传这个参数的客户端，但它本身没有任何效果，因为 stdio 已经是唯一的模式。每次工具调用都有上限明确的子进程超时，避免卡住的外部命令无限期占用 MCP 服务；MCP 暴露的是本地生命周期状态，不是进程调度器或通用 Automation Engine。
 
 大多数客户端不会手动运行它，而是配置成由客户端自己拉起。配置块在 Cursor、Windsurf、Claude Desktop，或任何读取 `mcpServers` 映射的客户端里都是一样的：
 
@@ -54,7 +54,7 @@ carryctx mcp
 以下是 `tools/list` 返回的确切工具名和 action 列表。这些 action 列表是权威内容，与 MCP 服务器实际向客户端广播的字符串完全一致。
 
 <Aside type="note">
-截至 0.7.0，[`team`](/zh-cn/2-cli-reference/10-teams/) 命令族还没有专门的 MCP 工具。团队成员管理以及 `team status` / `team context` 投影目前仅通过 CLI 使用。
+团队成员管理以及 `team status` / `team context` 投影仍仅通过 CLI 使用；指挥官需要完整团队投影时请使用 CLI。
 </Aside>
 
 ### `carryctx_graph_explorer`

@@ -14,6 +14,8 @@ carryctx mcp
 
 This starts a stdio JSON-RPC server: it reads one JSON-RPC request per line from stdin and writes one response per line to stdout. There is no other transport (no HTTP, no sockets); a `--stdio` flag is accepted for compatibility with clients that always pass it, but it has no effect since stdio is the only mode.
 
+Each tool call uses a bounded subprocess timeout so a stalled external command cannot hold the MCP server indefinitely. MCP exposes CarryCtx's local lifecycle state; it does not turn CarryCtx into a process scheduler or generic Automation Engine.
+
 Most clients don't run this manually, you configure them to spawn it. The config block is the same for Cursor, Windsurf, Claude Desktop, or any other client that reads an `mcpServers` map:
 
 ```json
@@ -54,7 +56,7 @@ Internally, CarryCtx maps the tool name to a CLI subcommand, appends `--json`, a
 These are the exact tool names and action lists returned by `tools/list`. Treat the action lists below as authoritative, they are the same strings the MCP server advertises to a client.
 
 <Aside type="note">
-As of 0.7.0 there is no dedicated MCP tool for the [`team`](/2-cli-reference/10-teams/) command family. Team membership and the `team status` / `team context` projections are CLI-only for now.
+Team membership and the `team status` / `team context` projections remain CLI-only; use the CLI when a commander needs the complete team projection.
 </Aside>
 
 ### `carryctx_graph_explorer`

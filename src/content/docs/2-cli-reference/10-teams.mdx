@@ -6,12 +6,12 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-A Team (0.6.0+) is a durable, project-scoped roster of agents. It lives in the same `state.sqlite` as your tasks, which means it outlives the session that created it: close the window, open a new one, or `cd` into a linked worktree, and the team is still there with the same members, the same commander, and the same task associations.
+A Team is a durable, project-scoped roster of agents. It lives in the shared `state.sqlite` as your tasks, which means it outlives sessions, windows, and linked worktrees.
 
 Teams answer three questions that used to live only in a prompt or in someone's head: **who is on this team**, **what is each member working on**, and **what does a given member need to know right now**. They do not run anybody's agents.
 
 <Aside type="caution">
-CarryCtx is the management and persistence layer, not an orchestration framework. Spawning processes, routing work, retries, concurrency limits, worktree creation, heartbeats, and model selection all belong to the harness that calls CarryCtx. 0.6.0 ships no scheduler, no worker runtime, and no lease or heartbeat machinery.
+CarryCtx is the lifecycle management and persistence layer, not a process scheduler. Spawning processes, routing work, retries, concurrency limits, and model selection belong to the external harness. CarryCtx 0.8.0 does not claim a generic Automation Engine, Completion Gates, or lease/heartbeat runtime.
 </Aside>
 
 ## Creating a team
@@ -133,7 +133,7 @@ carryctx agent register --name commander-1 --provider claude-code --kind command
 carryctx agent register --name backend-1 --provider claude-code --kind subagent
 ```
 
-`--kind` accepts `commander` or `subagent` and is nullable — agents registered before 0.6.0, or without the flag, simply have no kind. It's a hint for the harness and for reading `team status`, not a permission boundary.
+`--kind` accepts `commander` or `subagent` and is nullable. It is a hint for the harness and for reading `team status`, not a permission boundary.
 
 ## Read-only projections
 
@@ -223,22 +223,22 @@ carryctx team context payments-squad --task CTX-0002
 
 This is the projection you feed to an agent. It reconstructs everything the team (or one member, or one task) needs from durable records:
 
-| Field                        | Contents                                                                                                                            |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `team`                       | `id` and `name` of the projected team.                                                                                              |
-| `view`                       | `commander` (whole team), `member` (`--agent-for`), or `task` (`--task`).                                                           |
-| `members`                    | Roster, narrowed to the subject when `--agent-for` is used.                                                                         |
-| `tasks`                      | Team tasks in scope, with `owner_agent_id`, `required_role`, `status`, `priority`.                                                  |
-| `dependencies`               | Dependency edges, closed over the returned task set.                                                                                |
-| `scopes` / `scope_conflicts` | File-scope reservations. Present in the envelope; no 0.6.0 CLI command writes them, so they are empty in practice.                  |
-| `progress`                   | Open progress items across the in-scope tasks.                                                                                      |
-| `blockers`                   | The subset of progress items of type `blocker`.                                                                                     |
-| `conflicts`                  | Currently mirrors `scope_conflicts`.                                                                                                |
-| `latest_checkpoints`         | Most recent checkpoint per in-scope task.                                                                                           |
-| `decisions`                  | Decisions attached to in-scope tasks.                                                                                               |
-| `handoffs`                   | Handoffs touching in-scope tasks, with status.                                                                                      |
-| `recent_events`              | Recent audit events for in-scope tasks.                                                                                             |
-| `rebuild`                    | Provenance: `source` is `"durable_records"`, plus the `session_id` the projection was rebuilt for (`null` when none is resolvable). |
+|Field|Contents|
+|---|---|
+|`team`|`id` and `name` of the projected team.|
+|`view`|`commander` (whole team), `member` (`--agent-for`), or `task` (`--task`).|
+|`members`|Roster, narrowed to the subject when `--agent-for` is used.|
+|`tasks`|Team tasks in scope, with `owner_agent_id`, `required_role`, `status`, `priority`.|
+|`dependencies`|Dependency edges, closed over the returned task set.|
+|`scopes` / `scope_conflicts`|File-scope metadata and conflict projections when recorded for a task.|
+|`progress`|Open progress items across the in-scope tasks.|
+|`blockers`|The subset of progress items of type `blocker`.|
+|`conflicts`|Currently mirrors `scope_conflicts`.|
+|`latest_checkpoints`|Most recent checkpoint per in-scope task.|
+|`decisions`|Decisions attached to in-scope tasks.|
+|`handoffs`|Handoffs touching in-scope tasks, with status.|
+|`recent_events`|Recent audit events for in-scope tasks.|
+|`rebuild`|Provenance: `source` is `"durable_records"`, plus the `session_id` the projection was rebuilt for (`null` when none is resolvable).|
 
 `--agent-for` and `--task` narrow **every** collection consistently, and dependency edges are closed over the returned task set — so an edge only appears if both of its tasks are in scope. Narrowing to `backend-1`, whose two tasks have no edge between them, drops `dependencies` to empty even though `CTX-0002` depends on `CTX-0001` project-wide:
 
