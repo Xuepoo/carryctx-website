@@ -158,7 +158,7 @@ carryctx team context payments-squad --agent-for claude-core
 
 ## 9. 协调清理并发布
 
-评审完成、任务结束后，v0.8 可以根据项目策略创建持久化清理请求。使用 `carryctx worktree cleanup list` 查看待处理或阻塞请求，用 `carryctx worktree cleanup run` 重试安全协调。脏 Worktree、活跃会话、锁、缺失路径与 jj colocated 仓库会保留为可见阻塞。使用 `carryctx stats` 与 `carryctx event list` 为发布保留审计和统计证据。
+评审完成、任务结束后，v0.8 可以根据项目策略创建持久化清理请求。使用 `carryctx worktree cleanup list` 查看待处理或阻塞请求，用 `carryctx worktree cleanup run` 重试安全协调。路径已经不存在时，会幂等地按“已移除”处理，并清理对应的陈旧注册；脏 Worktree、活跃会话、锁、缺失 Git 元数据与 jj colocated 仓库仍会作为可见阻塞。未知注册属于查找错误，不应当按已移除的工作区处理。使用 `carryctx stats` 与 `carryctx event list` 为发布保留审计和统计证据。
 
 ## 接下来看什么
 

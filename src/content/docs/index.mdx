@@ -94,7 +94,7 @@ import Reveal from '../../components/Reveal.astro';
 <div class="ctx-reveal">
 <Steps>
  1. **Set the contract.** `carryctx init` records the project configuration and creates state at `<git-common-dir>/carryctx/state.sqlite`.
- 2. **Plan the work.** Create tasks, dependencies, scopes, validation expectations, and a ready queue.
+  2. **Plan the work.** Create tasks, dependencies, scopes, and a ready queue; let the external harness define and run validation, then record the evidence in checkpoints.
  3. **Define roles and teams.** Register humans, commanders, and role-specialized subagents; the external harness decides scheduling.
  4. **Run sessions in worktrees.** Bind worktrees, claim tasks, and record progress and Git-aware checkpoints.
  5. **Handoff and review.** Transfer ownership explicitly, review the work, and preserve decisions and verification results.

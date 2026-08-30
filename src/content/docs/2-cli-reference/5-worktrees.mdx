@@ -47,7 +47,7 @@ carryctx worktree show ../ctx-0001
 carryctx worktree status
 ```
 
-`list` shows every worktree CarryCtx knows about for the project, merged with whatever `git worktree list` reports for the current repository (the main checkout is filtered out of that merge, so only extra worktrees show up). `show` looks up one worktree by path or ID and refreshes its branch/HEAD live from Git rather than from the last-saved values. `status` prints the registered worktrees and Git's own worktree list side by side, useful for spotting drift between the two.
+`list` shows every worktree CarryCtx knows about for the project, merged with whatever `git worktree list` reports for the current repository (the main checkout is filtered out of that merge, so only extra worktrees show up). `show` looks up one worktree by path or ID and refreshes its branch/HEAD live from Git rather than from the last-saved values. `status` prints the registered worktrees and Git's own worktree list side by side, useful for spotting drift between the two. A path with no matching registration is an unknown worktree reference and cannot be reconciled as removed.
 
 ### `carryctx worktree unbind`
 
@@ -58,7 +58,7 @@ carryctx worktree unbind ../ctx-0001
 Clears the task binding on a worktree, by path or ID. This only removes the CarryCtx association: it does not delete the directory, remove the Git worktree, or touch the branch.
 
 <Aside type="note">
-v0.8 adds persistent cleanup requests and policies. `worktree cleanup list`, `show`, and `run` reconcile safe removal attempts; dirty worktrees, active sessions, locks, missing paths, and jj-colocated repositories remain observable blockers rather than being silently deleted. `unbind` still only detaches a task.
+v0.8 adds persistent cleanup requests and policies. `worktree cleanup list`, `show`, and `run` reconcile safe removal attempts. If a registered path is already gone, cleanup treats it idempotently as already removed and deletes the stale registration. An existing path whose Git metadata is missing remains a visible `missing_git_metadata` blocker; dirty worktrees, active sessions, locks, and jj-colocated repositories are also observable blockers rather than being silently deleted. An unknown registration is a lookup error, not an already-removed worktree. `unbind` still only detaches a task.
 </Aside>
 
 ## Handoffs
