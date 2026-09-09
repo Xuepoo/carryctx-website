@@ -35,6 +35,46 @@ import Reveal from '../../components/Reveal.astro';
   </div>
 </div>
 
+## What CarryCtx is
+
+<p class="ctx-lede ctx-reveal">
+  CarryCtx is the <strong>durable project state and control layer</strong> that sits between your repository and every agent or human working in it. Three ideas define it.
+</p>
+
+<div class="ctx-reveal">
+<CardGrid>
+  <Card title="Durable State" icon="document">
+    One SQLite file at `<git-common-dir>/carryctx/state.sqlite`, shared by every linked worktree. Tasks, dependencies, sessions, checkpoints, handoffs, decisions, events, and analytics are queryable rows — not prose an agent must re-parse each session.
+  </Card>
+  <Card title="Lifecycle" icon="random">
+    From `init` and dependency-aware planning through roles and teams, worktree-bound sessions, progress and checkpoints, handoffs and review, to cleanup, reconciliation, and release evidence — one control plane for the full delivery loop.
+  </Card>
+  <Card title="Portable Offline State" icon="approve-check-circle">
+    Fully local and offline by default. No cloud service, account, or network round-trip. Move state with `carryctx export` / `import` (`ctxpack`) and let Git, SSH, or any external transport you choose carry the artifact.
+  </Card>
+</CardGrid>
+</div>
+
+<div class="ctx-reveal">
+
+### What it is not
+
+<CardGrid>
+  <Card title="Not an agent harness" icon="error">
+    CarryCtx does not launch, schedule, or route agent processes. Your external harness owns execution — CarryCtx persists the coordination state those processes rely on.
+  </Card>
+  <Card title="Not a Claude Code replacement" icon="error">
+    It is agent-agnostic. Claude Code, Codex, OpenCode, Copilot, or a human at a terminal all speak the same CLI and stdio MCP surface.
+  </Card>
+  <Card title="Not a cloud sync service" icon="error">
+    No hosted state, no telemetry, no required account. Portable state travels as a local file you control.
+  </Card>
+  <Card title="Not a TODO list" icon="error">
+    Dependency-gated tasks, CAS-safe claims and handoffs, Git-aware checkpoints, and an append-only event log — richer than any checklist.
+  </Card>
+</CardGrid>
+</div>
+
 ## Core Features
 
   <p class="ctx-lede ctx-reveal">

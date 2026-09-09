@@ -1,0 +1,19 @@
+{
+  "project": "carryctx-website",
+  "positioning": {
+    "en": ["Durable State", "Lifecycle", "Portable Offline State"],
+    "zh": ["持久化状态", "全生命周期", "可携带的离线状态"],
+    "nots": ["Not an agent harness", "Not a Claude Code replacement", "Not a cloud sync service", "Not a TODO list"]
+  },
+  "homepage": {
+    "en": "src/content/docs/index.mdx",
+    "zh": "src/content/docs/zh-cn/index.mdx"
+  },
+  "ci": {
+    "frozenInstall": true,
+    "astroCheck": true,
+    "markdownlint": true,
+    "linkCheck": "offline lychee on dist",
+    "buildSplit": "ci.yml (PR) + deploy.yml (main)"
+  }
+}

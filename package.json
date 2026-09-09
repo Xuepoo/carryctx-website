@@ -12,7 +12,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check": "astro check",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#dist\" \"#.astro\""
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.3",
@@ -21,5 +23,9 @@
   },
   "engines": {
     "node": ">=22.12.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "5.9.3"
   }
 }

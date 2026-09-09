@@ -1,34 +1,30 @@
-name: Deploy to Cloudflare Pages
+name: CI
 on:
+  pull_request:
+    branches: [main]
   push:
-    branches: ["main"]
+    branches: [main]
 
 jobs:
-  deploy:
+  verify:
     runs-on: ubuntu-latest
-    needs: []
     steps:
       - uses: actions/checkout@v4
-
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.4
-
       - name: Install dependencies (frozen)
         run: bun install --frozen-lockfile
-
       - name: Astro check
         run: bunx astro check
-
       - name: Markdownlint
         run: bunx markdownlint-cli2 "**/*.md" "#node_modules" "#dist" "#.astro"
-
-      - name: Build Astro
+      - name: Build
         run: bun run build
-
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+      - name: Link check (offline)
+        uses: lycheeverse/lychee-action@v2
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name carryctx
+          args: --offline --no-progress --verbose "dist/**/*.html"
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

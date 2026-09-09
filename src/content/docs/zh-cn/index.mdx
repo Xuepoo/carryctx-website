@@ -35,6 +35,46 @@ import Reveal from '../../../components/Reveal.astro';
   </div>
 </div>
 
+## CarryCtx 是什么
+
+<p class="ctx-lede ctx-reveal">
+  CarryCtx 是位于仓库与每一位 Agent / 协作者之间的<strong>持久化项目状态与控制层</strong>。三个关键词定义它。
+</p>
+
+<div class="ctx-reveal">
+<CardGrid>
+  <Card title="持久化状态" icon="document">
+    一份位于 `<git-common-dir>/carryctx/state.sqlite` 的 SQLite 文件，由所有关联 Worktree 共享。任务、依赖、会话、检查点、交接、决策、事件与统计都是可查询的行记录——不是每次都要重读的流水账。
+  </Card>
+  <Card title="全生命周期" icon="random">
+    从 `init` 与依赖化规划，到角色与团队、Worktree 绑定的会话、进度与检查点、交接到评审，再到清理、协调与发布证据——一个控制面覆盖完整交付链路。
+  </Card>
+  <Card title="可携带的离线状态" icon="approve-check-circle">
+    默认完全本地、完全离线。无云服务、无账号、无网络往返。通过 `carryctx export` / `import`（`ctxpack`）搬运状态，传输交给 Git、SSH 或你选择的任意外部工具。
+  </Card>
+</CardGrid>
+</div>
+
+<div class="ctx-reveal">
+
+### 它不是什么
+
+<CardGrid>
+  <Card title="不是 Agent Harness" icon="error">
+    CarryCtx 不负责拉起、调度或分发 Agent 进程。执行归外部 harness 掌管——CarryCtx 只持久化这些进程据以协作的状态。
+  </Card>
+  <Card title="不是 Claude Code 替代品" icon="error">
+    它与 Agent 无关。Claude Code、Codex、OpenCode、Copilot 或终端前的人类，都使用同一套 CLI 与 stdio MCP 接口。
+  </Card>
+  <Card title="不是云端同步服务" icon="error">
+    无托管状态、无遥测、无强制账号。状态以本地文件形式由你掌控与搬运。
+  </Card>
+  <Card title="不是 TODO List" icon="error">
+    依赖门控的任务、CAS 安全的认领与交接、Git 感知的检查点与只追加事件日志——远比清单更丰富的模型。
+  </Card>
+</CardGrid>
+</div>
+
 ## 核心特性
 
 <p class="ctx-lede ctx-reveal">
