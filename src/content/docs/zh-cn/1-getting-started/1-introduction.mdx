@@ -50,7 +50,7 @@ Git 非常擅长记录代码在历史上每个时间点的样子。但它不是�
 - **CarryCtx 负责持久化的那些答案。** 这个团队里有谁、指挥官是谁、每个成员在做什么、哪里被阻塞、做过哪些决策，以及某个成员此刻需要知道什么。全部存在 SQLite 里，每次窗口关闭之后依然在那里。
 - **外部 harness 负责执行进程。** 拉起进程、调度和路由调用、重试、并发上限、模型选择仍在 CarryCtx 之外；CarryCtx 持久化这些进程协调所需的任务、依赖、会话、Worktree、检查点、交接、清理请求与审计状态。
 
-CarryCtx 0.8.0 不声称提供通用 Automation Engine 或 Completion Gates。它提供的是完整生命周期所需的持久基底：依赖门控任务、CAS 安全的认领与交接、有界 MCP 调用、显式清理策略、`task edit --force` 修正、键集分页事件和只读团队投影。对于 jj colocated 仓库，在 Git Worktree 或 hook 不安全的地方会主动阻止操作。CarryCtx 不调度也不运行任何人的 agent。
+CarryCtx 0.9.0 不声称提供通用 Automation Engine 或 Completion Gates。它提供的是完整生命周期所需的持久基底：依赖门控任务、CAS 安全的认领与交接、有界 MCP 调用、显式清理策略、`task edit --force` 修正、键集分页事件和只读团队投影。对于 jj colocated 仓库，在 Git Worktree 或 hook 不安全的地方会主动阻止操作。CarryCtx 不调度也不运行任何人的 agent。
 
 ## 它在你的工作流中处于什么位置
 
