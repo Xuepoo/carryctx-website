@@ -121,3 +121,7 @@ That failure is reported as `SYNC_PROJECT_MISMATCH`. `pull` also takes a pre-pul
 </Aside>
 
 Because `sync pull` overwrites the local database wholesale, treat it as a full-state replace, not a merge: pulling from a remote after making local-only changes discards those local changes in favor of the remote copy.
+
+## Moving state across machines
+
+`sync` copies a whole database file; `export`/`import` (0.8.2+) go one step further and produce a portable directory (`manifest.json` plus per-table `*.jsonl`) that survives path changes between machines — importing into a fresh checkout re-anchors absolute paths instead of carrying the old ones over. Transport is still yours (`scp`, a shared folder, Syncthing); CarryCtx only serializes, validates, and swaps atomically. Start with `carryctx export --help`.

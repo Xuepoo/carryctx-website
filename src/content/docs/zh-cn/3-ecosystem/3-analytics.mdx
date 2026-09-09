@@ -121,3 +121,7 @@ Error: Remote database belongs to a different CarryCtx project.
 </Aside>
 
 由于 `sync pull` 是整体覆盖本地数据库，应当把它当作「整体状态替换」而非「合并」：在有本地专属改动的情况下从远端拉取，会用远端副本丢弃掉这些本地改动。
+
+## 跨机器搬运状态
+
+`sync` 复制整个数据库文件；`export`/`import`(0.8.2+)则更进一步，产出可移植目录（`manifest.json` 加每表 `*.jsonl`），在机器之间换路径也不怕——导入到全新检出时会重锚定绝对路径，而不是把旧路径带过去。传输方式仍然由你定（`scp`、共享文件夹、Syncthing）；CarryCtx 只负责序列化、校验与原子换入。从 `carryctx export --help` 开始。

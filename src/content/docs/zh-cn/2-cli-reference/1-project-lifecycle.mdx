@@ -147,6 +147,17 @@ carryctx project prune --older-than-days 60
 
 `project restore` 的设计是刻意保守的:它先校验备份文件再决定是否信任它,把恢复出的数据库作为候选暂存在正在使用的数据库旁边,然后才以原子方式换入。如果进程中途终止,下一次运行会识别出被打断的阶段并从那里恢复,而不是留下一个写坏一半的状态数据库。
 
+## `carryctx export` / `carryctx import`
+
+可移植的离线优先项目交换格式(0.8.2+)。`backup`/`restore` 在一台机器上搬运原生 SQLite 快照,而 `export` 把项目状态序列化为目录结构——`manifest.json`、`project.json` 加每表一个 `*.jsonl` 文件,由你自己带到另一台机器(U 盘、`scp`、Syncthing、NAS 均可;CarryCtx 绝不触碰网络):
+
+```bash
+carryctx export --pack-format dir -o ./ctxpack-dir/
+carryctx import ./ctxpack-dir/ [--mode replace] [--dry-run] [--yes]
+```
+
+导入到全新的 Git 检出中会复用包内的项目身份,并把绝对路径重锚定到新位置。在已初始化的项目上不带 `--mode` 重复导入会被拒绝(`STATE_CONFLICT`);`--mode merge` 尚未实现,会报告 `UNSUPPORTED_OPERATION`。两个方向都支持 `--dry-run`。
+
 ## `carryctx agent`
 
 用于管理项目中注册的 agent 的子命令。一个 agent 拥有名称、可选的 provider、可选的 role,以及 `active` 或 `deactivated` 状态。
