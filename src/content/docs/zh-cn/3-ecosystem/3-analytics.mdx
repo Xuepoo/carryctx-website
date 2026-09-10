@@ -106,7 +106,7 @@ carryctx sync push --remote /path/to/shared/backup
 carryctx sync pull --remote /path/to/shared/backup
 ```
 
-`sync push` 会把项目 SQLite 数据库经过 checkpoint 的 `VACUUM INTO` 快照发布到 `--remote` 指定的本地目录下（默认为 `/tmp/carryctx-remote`，建议自行覆盖）；`sync pull` 则把它取回本地项目数据库所在位置。整个机制仅此而已：对着你指定的目录做一次普通的本地文件复制。没有网络协议、没有云服务、没有服务端、没有定时同步，二进制里根本不含任何网络栈——`--remote` 是文件系统路径，不是 URL。
+`sync push` 会把项目 SQLite 数据库经过 checkpoint 的 `VACUUM INTO` 快照发布到 `--remote` 指定的本地目录下（必填，无默认值——请选择你可控的路径）；`sync pull` 则把它取回本地项目数据库所在位置。整个机制仅此而已：对着你指定的目录做一次普通的本地文件复制。没有网络协议、没有云服务、没有服务端、没有定时同步，二进制里根本不含任何网络栈——`--remote` 是文件系统路径，不是 URL。
 
 在 v0.9.0（自 v0.8 起）中，`sync pull` 会在替换任何内容之前完整校验本地目录中的数据库，并拒绝属于其他项目的数据库：
 
