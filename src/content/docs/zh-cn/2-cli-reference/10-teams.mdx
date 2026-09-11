@@ -148,6 +148,8 @@ carryctx team status payments-squad   # 单个团队
 
 带 ref 时返回 `{team, members, counts}`；不带 ref 时返回 `{teams: [...]}`，其中每个团队都是同样结构的对象。
 
+`--format text`（默认）为每个团队输出一行紧凑摘要；`--format markdown` 把同样的数据渲染为 GFM 表格。需要下面展示的 envelope 时使用 `--json`。
+
 ```json
 {
   "schema_version": 1,
@@ -222,6 +224,8 @@ carryctx team context payments-squad --task CTX-0002
 ```
 
 这就是你喂给 Agent 的那份投影。它完全基于持久化记录，重建出团队（或某一个成员、某一个任务）所需的全部信息：
+
+`--format text`（默认）输出一两行摘要；`--format markdown` 把该投影渲染为 GFM 表格（成员表，以及存在时的任务、阻塞项与近期事件表）。`--json` 输出下面展示的 envelope。
 
 |字段|内容|
 |---|---|

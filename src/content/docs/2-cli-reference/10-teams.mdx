@@ -148,6 +148,8 @@ carryctx team status payments-squad   # one team
 
 With a ref, the payload is `{team, members, counts}`; with no ref it's `{teams: [...]}` containing the same object per team.
 
+`--format text` (the default) prints a compact one-line summary per team; `--format markdown` renders the same data as a GFM table. Use `--json` for the envelope shown below.
+
 ```json
 {
   "schema_version": 1,
@@ -222,6 +224,8 @@ carryctx team context payments-squad --task CTX-0002
 ```
 
 This is the projection you feed to an agent. It reconstructs everything the team (or one member, or one task) needs from durable records:
+
+`--format text` (the default) prints a one/two-line summary; `--format markdown` renders the projection as GFM tables (members, plus tasks, blockers, and recent events when present). `--json` emits the envelope shown below.
 
 |Field|Contents|
 |---|---|
