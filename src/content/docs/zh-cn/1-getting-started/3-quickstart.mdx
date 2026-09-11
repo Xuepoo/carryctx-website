@@ -158,7 +158,19 @@ carryctx team context payments-squad --agent-for claude-core
 
 ## 9. 协调清理并发布
 
-评审完成、任务结束后，v0.9.0（自 v0.8 起）可以根据项目策略创建持久化清理请求。使用 `carryctx worktree cleanup list` 查看待处理或阻塞请求，用 `carryctx worktree cleanup run` 重试安全协调。路径已经不存在时，会幂等地按“已移除”处理，并清理对应的陈旧注册；脏 Worktree、活跃会话、锁、缺失 Git 元数据与 jj colocated 仓库仍会作为可见阻塞。未知注册属于查找错误，不应当按已移除的工作区处理。使用 `carryctx stats` 与 `carryctx event list` 为发布保留审计和统计证据。
+评审完成、任务结束后，v0.10.0（自 v0.8 起）可以根据项目策略创建持久化清理请求。使用 `carryctx worktree cleanup list` 查看待处理或阻塞请求，用 `carryctx worktree cleanup run` 重试安全协调。路径已经不存在时，会幂等地按“已移除”处理，并清理对应的陈旧注册；脏 Worktree、活跃会话、锁、缺失 Git 元数据与 jj colocated 仓库仍会作为可见阻塞。未知注册属于查找错误，不应当按已移除的工作区处理。使用 `carryctx stats` 与 `carryctx event list` 为发布保留审计和统计证据。
+
+## 10. 合并来自另一个 clone 的状态
+
+项目状态既可移植，也可合并。当同一个项目存在于多个 clone 中时，从其中一个导出快照，再合并进另一个——这是针对行的语义化三方合并，而不是对 JSONL 做逐行合并：
+
+```bash
+carryctx export --pack-format dir -o ./pack --snapshot
+# 由你自己把 ./pack（或快照 ref）搬到另一个 clone
+carryctx import ./pack --mode merge
+```
+
+若存在阻断冲突，会暂存以待复核：用 `carryctx conflict list` 查看，再用 `carryctx conflict resolve` 与 `carryctx conflict apply` 逐个了结。不支持对快照提交执行原生 `git merge`。完整工作流、快照 ref 与退出码见[合并与快照](/zh-cn/2-cli-reference/11-merge-and-snapshots/)。
 
 ## 接下来看什么
 
