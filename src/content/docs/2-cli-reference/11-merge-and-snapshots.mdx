@@ -41,7 +41,16 @@ On success the envelope adds `data.snapshot = {ref, commit, previousCommit, pare
 `--snapshot-ref` must be a full `refs/carryctx/...` name that passes `git check-ref-format`. Targets under `refs/heads/*` are refused with `INVALID_ARGUMENTS` (exit 2), including the reserved public redacted publication ref `refs/heads/carryctx-snapshots` (DEC-0052). The unredacted local ref is deliberately outside `refs/heads/*`, so a plain `git push` — even `push --all` — cannot move it, and CarryCtx itself never pushes. Concurrent ref movement fails closed with `GIT_ERROR` (exit 4) rather than force-overwriting.
 </Aside>
 
-Redacted publication on the dedicated `refs/heads/carryctx-snapshots` branch is a separate flow. Never push an unredacted snapshot ref to a public repository; use a private state remote, an encrypted transport, or exchange pack directories directly. A redacted bundle (`manifest.redacted: true`) is a publication artifact and is refused as a **merge source** (`UNSUPPORTED_OPERATION`, exit 10), though fresh and `replace` imports may still accept it.
+## Redacted publication
+
+Redacted publication on the dedicated `refs/heads/carryctx-snapshots` branch is a separate flow. CarryCtx never pushes it; you move the redacted artifact with your own `git push`:
+
+```bash
+carryctx export --pack-format dir -o ./pack --publication
+git push <remote> refs/heads/carryctx-snapshots
+```
+
+`--publication` runs the redaction pass, sets `manifest.redacted: true`, and commits the bundle to `refs/heads/carryctx-snapshots` (one commit per publication) using the same Git-plumbing compare-and-swap as `--snapshot` — no index, worktree, or network mutation. The local unredacted `refs/carryctx/local` ref and `snapshot_state` are untouched, and the target cannot be redirected. Never push an unredacted snapshot ref to a public repository; use a private state remote, an encrypted transport, or exchange pack directories directly. A redacted bundle (`manifest.redacted: true`) is a publication artifact that imports fresh or `replace`, but is refused as a **merge source** (`UNSUPPORTED_OPERATION`, exit 10). To recover a clone from a public redacted bundle, use `carryctx import --from-git <ref> --mode replace`.
 
 ## `carryctx import --from-git`
 

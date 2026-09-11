@@ -58,7 +58,7 @@ carryctx worktree unbind ../ctx-0001
 按路径或 ID 清除工作区的任务绑定。这只是移除 CarryCtx 内部的关联关系,不会删除目录、移除 Git 工作区,也不会动分支。
 
 <Aside type="caution">
-v0.10.0（自 v0.8 起）增加了持久化清理请求与策略。`worktree cleanup list`、`show`、`run` 会协调安全删除。已注册的路径如果已经不存在，清理会幂等地按“已移除”处理，并删除陈旧注册。仍然存在但缺少 Git 元数据的路径会保留为可见的 `missing_git_metadata` 阻塞；脏 Worktree、活跃会话、锁与 jj colocated 仓库也会作为可见阻塞保留，不会被静默删除。未知注册属于查找错误，不应当按已移除的工作区处理。`unbind` 仍然只解除任务绑定。
+v0.11.0（自 v0.8 起）增加了持久化清理请求与策略。`worktree cleanup list`、`show`、`run` 会协调安全删除。已注册的路径如果已经不存在，清理会幂等地按“已移除”处理，并删除陈旧注册。仍然存在但缺少 Git 元数据的路径会保留为可见的 `missing_git_metadata` 阻塞；脏 Worktree、活跃会话、锁与 jj colocated 仓库也会作为可见阻塞保留，不会被静默删除。未知注册属于查找错误，不应当按已移除的工作区处理。`unbind` 仍然只解除任务绑定。
 </Aside>
 
 ## Handoff(任务交接)

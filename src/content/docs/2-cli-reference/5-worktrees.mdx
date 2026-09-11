@@ -58,7 +58,7 @@ carryctx worktree unbind ../ctx-0001
 Clears the task binding on a worktree, by path or ID. This only removes the CarryCtx association: it does not delete the directory, remove the Git worktree, or touch the branch.
 
 <Aside type="note">
-v0.10.0 (since v0.8) adds persistent cleanup requests and policies. `worktree cleanup list`, `show`, and `run` reconcile safe removal attempts. If a registered path is already gone, cleanup treats it idempotently as already removed and deletes the stale registration. An existing path whose Git metadata is missing remains a visible `missing_git_metadata` blocker; dirty worktrees, active sessions, locks, and jj-colocated repositories are also observable blockers rather than being silently deleted. An unknown registration is a lookup error, not an already-removed worktree. `unbind` still only detaches a task.
+v0.11.0 (since v0.8) adds persistent cleanup requests and policies. `worktree cleanup list`, `show`, and `run` reconcile safe removal attempts. If a registered path is already gone, cleanup treats it idempotently as already removed and deletes the stale registration. An existing path whose Git metadata is missing remains a visible `missing_git_metadata` blocker; dirty worktrees, active sessions, locks, and jj-colocated repositories are also observable blockers rather than being silently deleted. An unknown registration is a lookup error, not an already-removed worktree. `unbind` still only detaches a task.
 </Aside>
 
 ## Handoffs

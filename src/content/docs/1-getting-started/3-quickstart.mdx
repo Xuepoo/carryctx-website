@@ -158,7 +158,7 @@ Neither command writes anything. Dispatching the work to those agents is your ha
 
 ## 9. Reconcile and release
 
-When work is reviewed and a task is complete, v0.10.0 (since v0.8) can create a persistent cleanup request according to project policy. Run `carryctx worktree cleanup list` to inspect pending or blocked requests and `carryctx worktree cleanup run` to retry safe reconciliation. A path that is already gone is reconciled idempotently as already removed, and its stale registration is cleaned up; dirty worktrees, active sessions, locks, missing Git metadata, and jj-colocated repositories remain visible blockers. An unknown registration is a lookup error, not an already-removed worktree. Use `carryctx stats` and `carryctx event list` to retain audit and analytics evidence for the release.
+When work is reviewed and a task is complete, v0.11.0 (since v0.8) can create a persistent cleanup request according to project policy. Run `carryctx worktree cleanup list` to inspect pending or blocked requests and `carryctx worktree cleanup run` to retry safe reconciliation. A path that is already gone is reconciled idempotently as already removed, and its stale registration is cleaned up; dirty worktrees, active sessions, locks, missing Git metadata, and jj-colocated repositories remain visible blockers. An unknown registration is a lookup error, not an already-removed worktree. Use `carryctx stats` and `carryctx event list` to retain audit and analytics evidence for the release.
 
 ## 10. Merge state from another clone
 

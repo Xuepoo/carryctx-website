@@ -104,7 +104,7 @@ Everything looks good!
 Any command that opens the project database (including `doctor` itself) transparently applies pending schema migrations first, so an upgrade from an older `carryctx` version self-heals on the next command you run — you don't need to run `project migrate` by hand for this. `doctor`'s `database.schema` check reflects the real state: it reports `error` with the specific pending migration names (and a `carryctx project migrate` fix command) only if migrations somehow couldn't be applied, not merely because a new one exists.
 </Aside>
 
-Before applying migrations, v0.10.0 (since v0.8) creates and verifies a `VACUUM INTO` backup under the state directory's `backups/`; it also validates contiguous migration history before continuing.
+Before applying migrations, v0.11.0 (since v0.8) creates and verifies a `VACUUM INTO` backup under the state directory's `backups/`; it also validates contiguous migration history before continuing.
 
 Separately, every state-changing command now takes a project admission lock for the duration of its write, so two commands can't interleave writes against the same project. The read-only `team status` and `team context` projections skip that lock entirely and can run concurrently with anything.
 

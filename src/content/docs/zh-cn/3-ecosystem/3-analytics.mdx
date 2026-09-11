@@ -108,7 +108,7 @@ carryctx sync pull --remote /path/to/shared/backup
 
 `sync push` 会把项目 SQLite 数据库经过 checkpoint 的 `VACUUM INTO` 快照发布到 `--remote` 指定的本地目录下（必填，无默认值——请选择你可控的路径）；`sync pull` 则把它取回本地项目数据库所在位置。整个机制仅此而已：对着你指定的目录做一次普通的本地文件复制。没有网络协议、没有云服务、没有服务端、没有定时同步，二进制里根本不含任何网络栈——`--remote` 是文件系统路径，不是 URL。
 
-在 v0.10.0（自 v0.8 起）中，`sync pull` 会在替换任何内容之前完整校验本地目录中的数据库，并拒绝属于其他项目的数据库：
+在 v0.11.0（自 v0.8 起）中，`sync pull` 会在替换任何内容之前完整校验本地目录中的数据库，并拒绝属于其他项目的数据库：
 
 ```text
 Error: Remote database belongs to a different CarryCtx project.
@@ -124,4 +124,4 @@ Error: Remote database belongs to a different CarryCtx project.
 
 ## 跨机器搬运状态
 
-`sync` 复制整个数据库文件；`export`/`import`（0.10.0，自 0.8.2 起）则更进一步，产出可移植目录（`manifest.json` 加每表 `*.jsonl`），在机器之间换路径也不怕——导入到全新检出时会重锚定绝对路径，而不是把旧路径带过去。传输方式仍然由你定（`scp`、共享文件夹、Syncthing）；CarryCtx 只负责序列化、校验与原子换入。从 `carryctx export --help` 开始。
+`sync` 复制整个数据库文件；`export`/`import`（0.11.0，自 0.8.2 起）则更进一步，产出可移植目录（`manifest.json` 加每表 `*.jsonl`），在机器之间换路径也不怕——导入到全新检出时会重锚定绝对路径，而不是把旧路径带过去。传输方式仍然由你定（`scp`、共享文件夹、Syncthing）；CarryCtx 只负责序列化、校验与原子换入。从 `carryctx export --help` 开始。

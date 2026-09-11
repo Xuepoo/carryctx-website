@@ -1,6 +1,6 @@
 {
   "name": "carryctx-website",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Astro documentation site for CarryCtx, a local-first project lifecycle manager for coding agents and human collaborators.",
   "homepage": "https://carryctx.xuepoo.xyz",
   "repository": {

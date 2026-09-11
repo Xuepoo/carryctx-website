@@ -41,7 +41,16 @@ carryctx export --pack-format dir -o ./pack/ [--snapshot] [--snapshot-ref=refs/c
 `--snapshot-ref` 必须是能通过 `git check-ref-format` 的完整 `refs/carryctx/...` 名称。`refs/heads/*` 下的目标会被以 `INVALID_ARGUMENTS`（exit 2）拒绝，包括为公开脱敏发布预留的 `refs/heads/carryctx-snapshots`（DEC-0052）。未脱敏的本地 ref 刻意放在 `refs/heads/*` 之外，因此普通的 `git push`——即使 `push --all`——也无法移动它，CarryCtx 自身也从不 push。并发移动 ref 会以 `GIT_ERROR`（exit 4）失败关闭，绝不 force 覆盖。
 </Aside>
 
-在专用 `refs/heads/carryctx-snapshots` 分支上的脱敏发布是另一套流程。绝不要把未脱敏的快照 ref 推送到公开仓库；请使用私有 state 远端、加密通道，或直接交换 pack 目录。脱敏包（`manifest.redacted: true`）是发布产物，作为**合并源**会被拒绝（`UNSUPPORTED_OPERATION`，exit 10），但 fresh 与 `replace` 导入仍可接受它。
+## 脱敏发布
+
+在专用 `refs/heads/carryctx-snapshots` 分支上的脱敏发布是另一套流程。CarryCtx 自身从不 push，由你用 `git push` 移动脱敏产物：
+
+```bash
+carryctx export --pack-format dir -o ./pack --publication
+git push <remote> refs/heads/carryctx-snapshots
+```
+
+`--publication` 会执行脱敏处理，写入 `manifest.redacted: true`，并用与 `--snapshot` 相同的 Git plumbing 比较交换，把包按「每次发布一个 commit」提交到 `refs/heads/carryctx-snapshots`——不触碰索引、工作树或网络。本地未脱敏的 `refs/carryctx/local` ref 与 `snapshot_state` 不受影响，且目标不可重定向。绝不要把未脱敏的快照 ref 推送到公开仓库；请使用私有 state 远端、加密通道，或直接交换 pack 目录。脱敏包（`manifest.redacted: true`）是发布产物，可 fresh 或 `replace` 导入，但作为**合并源**会被拒绝（`UNSUPPORTED_OPERATION`，exit 10）。要从公开脱敏包恢复一个 clone，请用 `carryctx import --from-git <ref> --mode replace`。
 
 ## `carryctx import --from-git`
 
