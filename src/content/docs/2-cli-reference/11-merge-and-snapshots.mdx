@@ -1,0 +1,160 @@
+---
+title: "Merge & Snapshots"
+sidebar:
+  order: 11
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+CarryCtx state is a SQLite database, not a text file. When two clones of the same project both change state offline, combining them means merging **rows** — respecting ULIDs, display ids, sequences, tombstones, and referential order — rather than joining two `*.jsonl` files line by line. The merge milestone shipped in 0.10.0 makes that first-class: portable `ctxpack` v2 bundles, a semantic three-way merge with a staged conflict workflow, and local Git snapshot refs that carry the export DAG with no network code in the binary.
+
+<Aside type="caution">
+Native `git merge` of snapshot commits is **unsupported**. Merging the bundle's `*.jsonl` line by line ignores ULID identity, unique display ids, sequences, tombstones, and referential order, so a text-merged tree can be internally inconsistent. CarryCtx performs the semantic merge and writes the merge commit itself; the supported order is `carryctx import --from-git <ref> --mode merge`, settle any conflicts, then `carryctx export --snapshot`.
+</Aside>
+
+## Why semantic merge
+
+Rows carry stable identity (ULID) and derived facts (display id, sequences) that a text merge cannot reason about. Two independent edits to the same row need a last-writer-wins decision on `updated_at`; a delete on one side and an edit on the other is a real conflict, not a trivially adjacent hunk; tasks live on a status lattice where terminal states win; and append-only tables merge by id union. The merge engine applies these policies deterministically (`merge(A, B)` equals `merge(B, A)` and `merge(M, M)` equals `M`), which line-level JSONL merging can never guarantee.
+
+## Portable bundles: `ctxpack` v2
+
+`export` writes a directory layout — `manifest.json`, `project.json`, and one `*.jsonl` file per table — that you carry yourself (USB stick, `scp`, Syncthing, NAS, a Git ref). The binary never touches the network. With schema 18 in place the writer emits format v2:
+
+- `manifest.parents` is the ordered export-id DAG (first export is `[]`), so the ancestor chain can be reconstructed offline.
+- `manifest.redacted` marks a publication artifact (default `false`).
+- `tombstones.jsonl` records deletions; `counts.tombstones` exists even when `0`.
+- Optional per-table `watermarks` are advisory only — merge correctness never depends on them.
+
+A v1 bundle stays readable for one release cycle and is migrated to an implicit v2 in memory. A bundle whose `format_version` or `schema_version` is newer than the reader is refused with `UNSUPPORTED_OPERATION` (exit 10) and nothing is written.
+
+## `carryctx export --snapshot`
+
+```bash
+carryctx export --pack-format dir -o ./pack/ [--snapshot] [--snapshot-ref=refs/carryctx/local]
+```
+
+After the bundle is written and validated, `--snapshot` commits the pack directory as one commit per snapshot to a local-only ref (default `refs/carryctx/local`) using Git plumbing — `hash-object`, `mktree`, `commit-tree`, and `update-ref` with compare-and-swap. It touches neither the index, the worktree, nor the network. The commit subject is `chore(ctxpack): snapshot <export_id> (<branch> @ <short-sha>)` and the message carries `CarryCtx-Export-Id`, `CarryCtx-Parents`, and `CarryCtx-Source` trailers, so the export-id DAG survives without any side file. `manifest.parents` records the current ref tip's export id, keeping the bundle self-describing even outside Git.
+
+On success the envelope adds `data.snapshot = {ref, commit, previousCommit, parentExportIds, parents, source}`, and `snapshot_state.last_export_id` / `last_snapshot_commit` are updated in the same transaction. A plain `export` without `--snapshot` writes `parents = []` and does not touch any ref. `--snapshot --dry-run` reports only `data.snapshot.wouldCommit`.
+
+<Aside type="note">
+`--snapshot-ref` must be a full `refs/carryctx/...` name that passes `git check-ref-format`. Targets under `refs/heads/*` are refused with `INVALID_ARGUMENTS` (exit 2), including the reserved public redacted publication ref `refs/heads/carryctx-snapshots` (DEC-0052). The unredacted local ref is deliberately outside `refs/heads/*`, so a plain `git push` — even `push --all` — cannot move it, and CarryCtx itself never pushes. Concurrent ref movement fails closed with `GIT_ERROR` (exit 4) rather than force-overwriting.
+</Aside>
+
+Redacted publication on the dedicated `refs/heads/carryctx-snapshots` branch is a separate flow. Never push an unredacted snapshot ref to a public repository; use a private state remote, an encrypted transport, or exchange pack directories directly. A redacted bundle (`manifest.redacted: true`) is a publication artifact and is refused as a **merge source** (`UNSUPPORTED_OPERATION`, exit 10), though fresh and `replace` imports may still accept it.
+
+## `carryctx import --from-git`
+
+```bash
+carryctx import --from-git <ref> [--mode replace|merge] [--base <dir|export-id|ref>] [--snapshot-ref[=<ref>]]
+```
+
+`--from-git` materializes the ref tip's tree into a temporary bundle directory (using the fixed pack file list) and then runs the exact same validate/import/merge path as a directory import; the temporary directory is removed afterwards. Ancestor snapshots for base resolution are read from the same ref's offline history. `--from-git` and the positional `<DIR>` are mutually exclusive and exactly one is required. A missing ref or a non-Git repository returns `GIT_ERROR` (exit 4); a `--from-git` or `--base` value beginning with `-` returns `INVALID_ARGUMENTS` (exit 2).
+
+An `--from-git` import captures the ref tip's commit sha at materialize time, so the merge commit's second parent points at the commit the merged tree came from even if the ref moves concurrently.
+
+## `carryctx import --mode merge`
+
+```bash
+carryctx import <DIR> --mode merge [--base <PATH|EXPORT_ID|REF>] [--require-base] [--strict-edits]
+carryctx import --from-git <REF> --mode merge [--base <PATH|EXPORT_ID|REF>] [--require-base] [--strict-edits] [--snapshot-ref[=<ref>]]
+```
+
+`--mode merge` performs a three-way merge and composes state rather than discarding it, so it does **not** require `--yes`; `--yes` stays reserved for `--mode replace`. A fresh target takes the normal fresh-import path. A custom ref must use the equals form (`--snapshot-ref=refs/carryctx/custom`); a bare `--snapshot-ref` uses the default and cannot be followed by a positional argument, which clap would otherwise read as `DIR`.
+
+### Base selection
+
+The merge base is `merge-base(ours, theirs)` over the export-id DAG. Resolution order:
+
+1. An explicit `--base <PATH|EXPORT_ID|REF>`.
+2. The newest common ancestor found in the export-id DAG — read from the local snapshot cache and the snapshot ref's offline history.
+3. The ours snapshot, when no better ancestor exists.
+4. A base-less, degraded two-way merge that still applies the row policies but can only detect conflicts through tombstones and structural keys; the envelope and merge report then carry `base: null` and `degraded: true`.
+
+`--require-base` refuses step 4 with `VALIDATION_FAILED` (exit 8) instead of degrading. The local snapshot ref's history participates in base resolution only when `--snapshot-ref` is passed explicitly, which is what lets a second cross-clone merge find the common ancestor.
+
+### Merge semantics
+
+Row-level last-writer-wins by `updated_at`, NULL-union for monotonic facts, a task status lattice where terminal states win (`completed` vs `cancelled` is the only blocking pair), tombstone deletion rules, automatic display-id renumbering, automatic agent-name aliasing, and id-union for append-only tables. `--strict-edits` promotes automatic row-edit last-writer-wins resolutions into blocking conflicts so you review every competing edit.
+
+### Conflict staging
+
+A project identity mismatch returns `STATE_CONFLICT` (exit 3); a redacted bundle as a merge source returns `UNSUPPORTED_OPERATION` (exit 10). When the engine cannot resolve a blocking conflict, it writes a merge session under `<git-common-dir>/carryctx/merges/<merge_id>/`:
+
+```text
+merge.json         ids, base, source ref/dir, counts, status, degraded flag
+conflicts.json     conflict records plus resolutions (append-only list)
+candidate.sqlite   merged result, conflicts left at "ours"
+theirs/            materialized incoming bundle
+```
+
+It then exits with `MERGE_CONFLICTS` (exit 3, carrying `details.mergeId` and `details.conflicts`) and leaves the live database and refs untouched. Only one merge may be active per project; a second `--mode merge` refuses until `conflict apply` or `conflict abort`. `doctor` reports the active session (`merges.active`) and flags stale ones.
+
+A clean merge takes a verified pre-merge backup and uses the restore-journal atomic swap, appending exactly one `project.merged` event plus `merge.auto_resolved` / `merge.display_id_renumbered` provenance events. Any failure leaves the live database, staging, and candidate untouched, so retries are safe. `--dry-run` validates and plans only — no database write, no ref write, no directory.
+
+## The `conflict` command family
+
+When conflicts are staged, inspect and resolve them without touching the live database until you `apply`:
+
+| Command | Purpose |
+| --- | --- |
+| `conflict list [--all] [--merge <id>]` | List staged conflicts. Defaults to open conflicts; `--all` adds resolved conflicts and auto-resolutions. |
+| `conflict show <id> [--merge <id>]` | Show the base/ours/theirs rows and the policy reason for one conflict. |
+| `conflict resolve <id> --ours\|--theirs [--set field=value] [--dry-run]` | Record a resolution choice for one conflict (does not modify `candidate.sqlite`). |
+| `conflict apply [--skip-open] [--snapshot-ref[=<ref>]] [--dry-run]` | Materialize every resolution and atomically swap the merged state in. |
+| `conflict abort [--dry-run]` | Delete the staged merge session without changing the database. |
+
+`--merge <id>` selects a specific session; omit it to use the single active session. With no usable session, the command returns `RESOURCE_NOT_FOUND` (exit 7). `--ours` and `--theirs` are mutually exclusive and one is required; `--set field=value` is repeatable, parses the value as JSON first and falls back to a string, and rejects a field absent from the chosen row with `VALIDATION_FAILED` (exit 8). `resolve` only appends `{choice, fields, resolvedAt, resolvedBy}` to `conflicts.json`; a `null` resolution means the conflict is still open.
+
+`apply` refuses while any conflict is unresolved (exit 3) unless `--skip-open`, which settles each remaining conflict at the local `ours` value and genuinely materializes that choice. It rebuilds an application image from the unmodified `candidate.sqlite`, materializes every resolution, appends exactly one `project.merged` plus a `merge.conflict_resolved` per settled conflict, and reuses the restore-journal atomic swap. An interrupted `apply` leaves the live database, staging, and candidate intact and is safe to retry without duplicating events; a successfully applied session becomes `applied` and is then treated as no active session. `abort` deletes the session directory with no database change.
+
+### Worked example
+
+```bash
+# B stages the incoming snapshot B' and finds a blocking conflict
+carryctx import --from-git refs/remotes/origin/state --mode merge \
+    --snapshot-ref refs/carryctx/local
+# -> exit 3 (MERGE_CONFLICTS), details.mergeId and details.conflicts
+
+carryctx conflict list
+carryctx conflict show 3
+carryctx conflict resolve 3 --ours
+carryctx conflict apply --snapshot-ref refs/carryctx/local
+# -> one project.merged event, plus a two-parent merge snapshot commit
+```
+
+## Cross-clone workflow
+
+Transport is always yours — CarryCtx never pushes or fetches. The binary only writes local snapshot commits, and Git moves them under an explicit user refspec:
+
+```bash
+# Clone A: export a snapshot and push the local ref explicitly
+carryctx export --pack-format dir -o ./pack --snapshot --snapshot-ref refs/carryctx/local
+git push <remote> refs/carryctx/local:refs/heads/state
+
+# Clone B: fetch, merge from the ref, then publish the merged snapshot
+git fetch <remote> refs/heads/state:refs/remotes/origin/state
+carryctx import --from-git refs/remotes/origin/state --mode merge \
+    --snapshot-ref refs/carryctx/local
+# if conflicts were staged:
+carryctx conflict list
+carryctx conflict resolve <conflict-id> --ours   # or --theirs / --set
+carryctx conflict apply --snapshot-ref refs/carryctx/local
+git push <remote> refs/carryctx/local:refs/heads/state
+```
+
+The command order is: fetch → `import --from-git` → resolve staged conflicts (or let the clean merge auto-apply) → `export --snapshot` → push. Because the local ref is orthogonal to code branches, `manifest.source.git_branch` records which code line an export came from.
+
+## Exit and error codes
+
+| Condition | Code | Exit |
+| --- | --- | --- |
+| Snapshot ref not under `refs/carryctx/*`, a `refs/heads/*` target, or a `--base`/`--from-git` value beginning with `-` | `INVALID_ARGUMENTS` | 2 |
+| Conflicts staged; `conflict apply` with open conflicts | `MERGE_CONFLICTS` | 3 |
+| Project id mismatch or conflicting mode use | `STATE_CONFLICT` | 3 |
+| Missing Git ref, not a Git repository, or a lost compare-and-swap on the snapshot ref | `GIT_ERROR` | 4 |
+| No active merge session or unknown conflict id | `RESOURCE_NOT_FOUND` | 7 |
+| Invalid or tampered bundle; `--require-base` with no ancestor; unknown `--set` field | `VALIDATION_FAILED` | 8 |
+| Bundle format/schema newer than the reader; redacted bundle used as a merge source | `UNSUPPORTED_OPERATION` | 10 |
+
+JSON errors carry `details.mergeId` and `details.conflicts` where applicable. `--dry-run` writes nothing in every case.

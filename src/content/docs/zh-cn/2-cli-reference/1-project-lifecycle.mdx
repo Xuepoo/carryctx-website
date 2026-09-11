@@ -104,7 +104,7 @@ Everything looks good!
 任何会打开项目数据库的命令(包括 `doctor` 本身)都会先透明地应用待处理的 schema 迁移,所以从旧版本的 `carryctx` 升级后,运行下一条命令就会自动修复,不需要手动执行 `project migrate`。`doctor` 的 `database.schema` 检查反映的是真实状态:只有在迁移确实无法应用时才会报 `error`(并给出具体缺失的迁移名和 `carryctx project migrate` 修复命令),而不是仅仅因为存在新迁移就报错。
 </Aside>
 
-v0.9.0（自 v0.8 起）在应用迁移前会在状态目录的 `backups/` 下创建并校验 `VACUUM INTO` 备份，并验证迁移历史是连续的前缀后才继续。
+v0.10.0（自 v0.8 起）在应用迁移前会在状态目录的 `backups/` 下创建并校验 `VACUUM INTO` 备份，并验证迁移历史是连续的前缀后才继续。
 
 另外,现在每一个会修改状态的命令在写入期间都会持有项目准入锁,因此两个命令不会对同一项目交错写入。只读的 `team status` 与 `team context` 投影完全跳过该锁,可以与任何命令并发运行。
 
@@ -149,14 +149,15 @@ carryctx project prune --older-than-days 60
 
 ## `carryctx export` / `carryctx import`
 
-可移植的离线优先项目交换格式(0.9.0，自 0.8.2 起)。`backup`/`restore` 在一台机器上搬运原生 SQLite 快照,而 `export` 把项目状态序列化为目录结构——`manifest.json`、`project.json` 加每表一个 `*.jsonl` 文件,由你自己带到另一台机器(U 盘、`scp`、Syncthing、NAS 均可;CarryCtx 绝不触碰网络):
+可移植的离线优先项目交换格式(ctxpack 目录；0.8.2 引入，`ctxpack` v2 与 `--mode merge` 自 0.10.0 起现行)。`backup`/`restore` 在一台机器上搬运原生 SQLite 快照,而 `export` 把项目状态序列化为目录结构——`manifest.json`、`project.json` 加每表一个 `*.jsonl` 文件,由你自己带到另一台机器(U 盘、`scp`、Syncthing、NAS 均可;CarryCtx 绝不触碰网络):
 
 ```bash
 carryctx export --pack-format dir -o ./ctxpack-dir/
-carryctx import ./ctxpack-dir/ [--mode replace] [--dry-run] [--yes]
+carryctx import ./ctxpack-dir/ [--mode replace|merge] [--dry-run] [--yes]
+carryctx import --from-git <ref> [--mode replace|merge]
 ```
 
-导入到全新的 Git 检出中会复用包内的项目身份,并把绝对路径重锚定到新位置。在已初始化的项目上不带 `--mode` 重复导入会被拒绝(`STATE_CONFLICT`);`--mode merge` 尚未实现,会报告 `UNSUPPORTED_OPERATION`。两个方向都支持 `--dry-run`。
+导入到全新的 Git 检出中会复用包内的项目身份,并把绝对路径重锚定到新位置。在已初始化的项目上不带 `--mode` 重复导入会被拒绝(`STATE_CONFLICT`);`--mode merge` 会基于导出 DAG 执行语义化三方合并,并把阻断冲突暂存给 `conflict` 命令族处理。`--snapshot` 会把校验通过的包提交到本地专用 `refs/carryctx/local` ref,`--from-git <ref>` 则导入从本地 ref tip 物化出的包——两者都完全离线。两个方向都支持 `--dry-run`。快照 ref 布局与完整的合并工作流见 [合并与快照](/zh-cn/2-cli-reference/11-merge-and-snapshots/)。
 
 ## `carryctx agent`
 

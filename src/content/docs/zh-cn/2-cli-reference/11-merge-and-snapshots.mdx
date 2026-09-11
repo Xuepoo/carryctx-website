@@ -1,0 +1,160 @@
+---
+title: "合并与快照 (Merge & Snapshots)"
+sidebar:
+  order: 11
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+CarryCtx 的状态是一个 SQLite 数据库，而不是文本文件。当同一个项目的两个 clone 各自离线修改了状态，把它们合到一起意味着合并**行**——要尊重 ULID、display id、sequence、tombstone 与引用顺序——而不是把两个 `*.jsonl` 文件逐行拼起来。0.10.0 交付的 merge milestone 让这件事成为一等能力：可移植的 `ctxpack` v2 包、带暂存冲突流程的语义化三方合并，以及承载 export DAG 的本地 Git 快照 ref，二进制内不含任何网络代码。
+
+<Aside type="caution">
+对快照提交执行原生 `git merge` **不受支持**。逐行合并包里的 `*.jsonl` 会忽略 ULID 身份、唯一 display id、sequence、tombstone 与引用顺序，文本合并出的 tree 可能内部不一致。CarryCtx 自己完成语义合并并写入合并提交；受支持的顺序是 `carryctx import --from-git <ref> --mode merge`，了结冲突后再执行 `carryctx export --snapshot`。
+</Aside>
+
+## 为什么是语义合并
+
+行携带稳定的身份（ULID）与派生事实（display id、sequence），这些是文本合并无法推理的。对同一行的两处独立修改，需要按 `updated_at` 做 last-writer-wins；一侧删除、另一侧编辑是真正的冲突，而不是相邻的文本块；任务位于一个状态格上，终态获胜；append-only 表按 id 并集合并。合并引擎确定性地应用这些策略（`merge(A, B)` 等于 `merge(B, A)`，`merge(M, M)` 等于 `M`），而这正是逐行合并 JSONL 永远无法保证的。
+
+## 可移植的包：`ctxpack` v2
+
+`export` 写出一个目录结构——`manifest.json`、`project.json`，以及每表一个 `*.jsonl` 文件——由你自己搬运（U 盘、`scp`、Syncthing、NAS 或一个 Git ref）。二进制绝不触碰网络。在 schema 18 就位后，writer 产出 format v2：
+
+- `manifest.parents` 是有序的 export-id DAG（首次导出为 `[]`），因此祖先链可以离线重建。
+- `manifest.redacted` 标记发布产物（默认 `false`）。
+- `tombstones.jsonl` 记录删除；即使为 `0`，`counts.tombstones` 也必须存在。
+- 可选的 per-table `watermarks` 仅供参考——合并正确性从不依赖它。
+
+v1 包在一个 release cycle 内保持可读，并在内存中迁移为隐式 v2。`format_version` 或 `schema_version` 比 reader 更新的包会被以 `UNSUPPORTED_OPERATION`（exit 10）拒绝，且不写入任何内容。
+
+## `carryctx export --snapshot`
+
+```bash
+carryctx export --pack-format dir -o ./pack/ [--snapshot] [--snapshot-ref=refs/carryctx/local]
+```
+
+在包写入并通过校验后，`--snapshot` 用 Git plumbing——`hash-object`、`mktree`、`commit-tree`，以及带比较交换的 `update-ref`——把 pack 目录按「每次快照一个 commit」提交到本地专用 ref（默认 `refs/carryctx/local`）。它不触碰索引、工作树或网络。commit subject 形如 `chore(ctxpack): snapshot <export_id> (<branch> @ <short-sha>)`，message 带 `CarryCtx-Export-Id`、`CarryCtx-Parents`、`CarryCtx-Source` trailer，因此无需任何旁挂文件即可重建 export-id DAG。`manifest.parents` 记录当前 ref tip 的 export id，使包即使脱离 Git 也自描述。
+
+成功后信封新增 `data.snapshot = {ref, commit, previousCommit, parentExportIds, parents, source}`，并在同一事务内更新 `snapshot_state.last_export_id` 与 `last_snapshot_commit`。不带 `--snapshot` 的普通 `export` 写出 `parents = []`，且不改动任何 ref。`--snapshot --dry-run` 只报告 `data.snapshot.wouldCommit`。
+
+<Aside type="note">
+`--snapshot-ref` 必须是能通过 `git check-ref-format` 的完整 `refs/carryctx/...` 名称。`refs/heads/*` 下的目标会被以 `INVALID_ARGUMENTS`（exit 2）拒绝，包括为公开脱敏发布预留的 `refs/heads/carryctx-snapshots`（DEC-0052）。未脱敏的本地 ref 刻意放在 `refs/heads/*` 之外，因此普通的 `git push`——即使 `push --all`——也无法移动它，CarryCtx 自身也从不 push。并发移动 ref 会以 `GIT_ERROR`（exit 4）失败关闭，绝不 force 覆盖。
+</Aside>
+
+在专用 `refs/heads/carryctx-snapshots` 分支上的脱敏发布是另一套流程。绝不要把未脱敏的快照 ref 推送到公开仓库；请使用私有 state 远端、加密通道，或直接交换 pack 目录。脱敏包（`manifest.redacted: true`）是发布产物，作为**合并源**会被拒绝（`UNSUPPORTED_OPERATION`，exit 10），但 fresh 与 `replace` 导入仍可接受它。
+
+## `carryctx import --from-git`
+
+```bash
+carryctx import --from-git <ref> [--mode replace|merge] [--base <dir|export-id|ref>] [--snapshot-ref[=<ref>]]
+```
+
+`--from-git` 把 ref tip 的 tree 物化到一个临时 bundle 目录（使用固定的 pack 文件列表），随后走与目录导入完全相同的 validate/import/merge 路径；临时目录用完即删。用于 base 解析的祖先快照从同一 ref 的离线历史读取。`--from-git` 与位置参数 `<DIR>` 互斥，且必须二选一。ref 不存在或不是 Git 仓库返回 `GIT_ERROR`（exit 4）；以 `-` 开头的 `--from-git` 或 `--base` 值返回 `INVALID_ARGUMENTS`（exit 2）。
+
+`--from-git` 导入在物化时即捕获 ref tip 的 commit sha，因此即使 ref 并发移动，合并提交的第二个 parent 仍指向被合并 tree 所属的 commit。
+
+## `carryctx import --mode merge`
+
+```bash
+carryctx import <DIR> --mode merge [--base <PATH|EXPORT_ID|REF>] [--require-base] [--strict-edits]
+carryctx import --from-git <REF> --mode merge [--base <PATH|EXPORT_ID|REF>] [--require-base] [--strict-edits] [--snapshot-ref[=<ref>]]
+```
+
+`--mode merge` 执行三方合并并组合状态，而不是丢弃状态，因此**不需要** `--yes`；`--yes` 仍保留给 `--mode replace`。fresh target 走普通的 fresh 导入路径。自定义 ref 必须使用等号形式（`--snapshot-ref=refs/carryctx/custom`）；裸 `--snapshot-ref` 使用缺省值，且其后不能跟位置参数，否则 clap 会把它当作 `DIR`。
+
+### base 选择
+
+合并基是 export-id DAG 上的 `merge-base(ours, theirs)`。解析顺序为：
+
+1. 显式给出的 `--base <PATH|EXPORT_ID|REF>`。
+2. export-id DAG 中最近的公共祖先——从本地 snapshot 缓存与 snapshot ref 的离线历史读取。
+3. 没有更好的祖先时，使用 ours snapshot。
+4. base-less 的降级 two-way 合并：仍应用行策略，但只能通过 tombstone 与结构键检测冲突；此时信封与 merge report 会带上 `base: null` 与 `degraded: true`。
+
+`--require-base` 会以 `VALIDATION_FAILED`（exit 8）拒绝第 4 步，而不是降级。本地 snapshot ref 的历史**仅在显式传入 `--snapshot-ref` 时**才参与 base 解析，这正是第二次跨 clone 合并能解析到公共祖先的原因。
+
+### 合并语义
+
+按 `updated_at` 的行级 last-writer-wins、单调事实的 NULL-union、终态获胜的任务状态格（`completed` 与 `cancelled` 是唯一阻断状态对）、tombstone 删除规则、display-id 冲突自动改号、agent 名称冲突自动 alias，以及 append-only 表按 id 并集。`--strict-edits` 会把 row_edit 的自动 last-writer-wins 提升为阻断冲突，让你复核每一处竞争编辑。
+
+### 冲突暂存
+
+项目身份不一致返回 `STATE_CONFLICT`（exit 3）；脱敏包作为合并源返回 `UNSUPPORTED_OPERATION`（exit 10）。当引擎无法解决某个阻断冲突时，它把合并会话写到 `<git-common-dir>/carryctx/merges/<merge_id>/`：
+
+```text
+merge.json         ids、base、source ref/dir、counts、status、degraded 标记
+conflicts.json     冲突记录与 resolution（append-only 列表）
+candidate.sqlite   合并结果，冲突停在 "ours" 一侧
+theirs/            物化后的传入 bundle
+```
+
+随后以 `MERGE_CONFLICTS`（exit 3，带 `details.mergeId` 与 `details.conflicts`）退出，live DB 与 refs 保持不变。同一项目同时只允许一个活动 merge；第二次 `--mode merge` 会被拒绝，直到 `conflict apply` 或 `conflict abort`。`doctor` 会报告活动会话（`merges.active`）并标记过期会话。
+
+干净的合并会先做一份校验过的 pre-merge backup，再走 restore-journal 原子交换，追加恰好一个 `project.merged` 事件，以及 `merge.auto_resolved` / `merge.display_id_renumbered` 的 provenance 事件。任一步失败都保持 live DB、staging 与 candidate 原样，重试安全。`--dry-run` 只做校验与计划——不写 DB、不写 ref、不建目录。
+
+## `conflict` 命令族
+
+冲突被暂存后，可在 `apply` 之前查看并解决它们，全程不影响 live 数据库：
+
+| 命令 | 用途 |
+| --- | --- |
+| `conflict list [--all] [--merge <id>]` | 列出暂存冲突。默认只列未解决冲突；`--all` 额外包含已解决冲突与自动解决记录。 |
+| `conflict show <id> [--merge <id>]` | 显示某个冲突的 base/ours/theirs 行与 policy reason。 |
+| `conflict resolve <id> --ours\|--theirs [--set field=value] [--dry-run]` | 记录某个冲突的解决选择（不修改 `candidate.sqlite`）。 |
+| `conflict apply [--skip-open] [--snapshot-ref[=<ref>]] [--dry-run]` | 物化每个 resolution，并原子地换入合并后的状态。 |
+| `conflict abort [--dry-run]` | 删除暂存的合并会话，不改动数据库。 |
+
+`--merge <id>` 选择指定会话；省略时使用唯一的活动会话。没有可用会话时返回 `RESOURCE_NOT_FOUND`（exit 7）。`--ours` 与 `--theirs` 互斥且必选其一；`--set field=value` 可重复，值优先按 JSON 解析，失败则按字符串处理，字段不存在于所选行时以 `VALIDATION_FAILED`（exit 8）拒绝。`resolve` 只把 `{choice, fields, resolvedAt, resolvedBy}` 追加到 `conflicts.json`；`resolution` 为 `null` 表示冲突仍未解决。
+
+只要还有未解决冲突，`apply` 就会拒绝（exit 3），除非加 `--skip-open`——它会为每个剩余冲突按本地 `ours` 值结算并真正物化该选择。`apply` 从未改动的 `candidate.sqlite` 重建一份应用镜像，物化每个 resolution，追加恰好一个 `project.merged` 以及每个被结算冲突一个 `merge.conflict_resolved`，随后复用 restore-journal 原子交换。中断的 `apply` 保持 live DB、staging 与 candidate 原样，可安全重试且不会重复追加事件；已成功应用的会话变为 `applied`，之后按无活动会话处理。`abort` 删除会话目录，不改动数据库。
+
+### 示例
+
+```bash
+# B 暂存传入的快照 B'，并发现一个阻断冲突
+carryctx import --from-git refs/remotes/origin/state --mode merge \
+    --snapshot-ref refs/carryctx/local
+# -> exit 3 (MERGE_CONFLICTS)，带 details.mergeId 与 details.conflicts
+
+carryctx conflict list
+carryctx conflict show 3
+carryctx conflict resolve 3 --ours
+carryctx conflict apply --snapshot-ref refs/carryctx/local
+# -> 一个 project.merged 事件，外加一个双亲合并快照提交
+```
+
+## 跨 clone 工作流
+
+传输始终由你决定——CarryCtx 从不 push 或 fetch。二进制只写本地快照提交，Git 在显式的用户 refspec 下搬运它们：
+
+```bash
+# Clone A：导出快照并显式推送本地 ref
+carryctx export --pack-format dir -o ./pack --snapshot --snapshot-ref refs/carryctx/local
+git push <remote> refs/carryctx/local:refs/heads/state
+
+# Clone B：fetch、从 ref 合并，再发布合并后的快照
+git fetch <remote> refs/heads/state:refs/remotes/origin/state
+carryctx import --from-git refs/remotes/origin/state --mode merge \
+    --snapshot-ref refs/carryctx/local
+# 若暂存了冲突：
+carryctx conflict list
+carryctx conflict resolve <conflict-id> --ours   # 或 --theirs / --set
+carryctx conflict apply --snapshot-ref refs/carryctx/local
+git push <remote> refs/carryctx/local:refs/heads/state
+```
+
+命令顺序是：fetch → `import --from-git` → 解决暂存冲突（或让干净合并自动应用）→ `export --snapshot` → push。由于本地 ref 与代码分支正交，`manifest.source.git_branch` 记录一次导出来自哪条代码线。
+
+## 退出与错误码
+
+| 条件 | Code | Exit |
+| --- | --- | --- |
+| 快照 ref 不在 `refs/carryctx/*` 下、目标属于 `refs/heads/*`，或以 `-` 开头的 `--base`/`--from-git` 值 | `INVALID_ARGUMENTS` | 2 |
+| 冲突已暂存；`conflict apply` 仍有未解决冲突 | `MERGE_CONFLICTS` | 3 |
+| 项目 id 不一致或 mode 冲突使用 | `STATE_CONFLICT` | 3 |
+| Git ref 缺失、非 Git 仓库，或快照 ref 的比较交换失败 | `GIT_ERROR` | 4 |
+| 无活动合并会话或未知 conflict id | `RESOURCE_NOT_FOUND` | 7 |
+| 包非法或被篡改；`--require-base` 且无可用祖先；未知 `--set` 字段 | `VALIDATION_FAILED` | 8 |
+| 包的 format/schema 比 reader 更新；脱敏包用作合并源 | `UNSUPPORTED_OPERATION` | 10 |
+
+JSON 错误在适用时带 `details.mergeId` 与 `details.conflicts`。所有情况下 `--dry-run` 都不写入任何内容。

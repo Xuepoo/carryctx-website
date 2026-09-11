@@ -49,8 +49,8 @@ import Reveal from '../../../components/Reveal.astro';
   <Card title="全生命周期" icon="random">
     从 `init` 与依赖化规划，到角色与团队、Worktree 绑定的会话、进度与检查点、交接到评审，再到清理、协调与发布证据——一个控制面覆盖完整交付链路。
   </Card>
-  <Card title="可携带的离线状态" icon="approve-check-circle">
-    默认完全本地、完全离线。无云服务、无账号、无网络往返。通过 `carryctx export` / `import`（`ctxpack`）搬运状态，传输交给 Git、SSH 或你选择的任意外部工具。
+  <Card title="可携带、可合并的离线状态" icon="approve-check-circle">
+    默认完全本地、完全离线。无云服务、无账号、无网络往返。通过 `carryctx export` / `import`（`ctxpack` v2）搬运状态，用语义化三方合并协调两个 clone，传输交给 Git、SSH 或你选择的任意外部工具。
   </Card>
 </CardGrid>
 </div>
@@ -104,7 +104,7 @@ import Reveal from '../../../components/Reveal.astro';
     把工作流 SOP、编码规则和 Agent 人格安装进 `.carryctx/`——约定跟着仓库走，而不是散落在 prompt 里。
   </Card>
   <Card title="生命周期清理与证据" icon="approve-check-circle">
-    v0.9.0（自 v0.8 起）记录清理请求与策略，安全协调 Worktree 删除，并在发布前保留审计与统计证据。
+    v0.10.0（自 v0.8 起）记录清理请求与策略，安全协调 Worktree 删除，并在发布前保留审计与统计证据。
   </Card>
   <Card title="Agent 数据统计" icon="analytics">
     `carryctx stats` 按 Agent 汇总会话数、产出、检查点和阻塞项——用真实数字调优你的 harness，全程本地计算。
@@ -136,7 +136,7 @@ import Reveal from '../../../components/Reveal.astro';
  3. **定义角色和团队。** 注册人类、指挥官与角色化子 Agent；进程调度由外部 harness 决定。
  4. **在会话和 Worktree 中执行。** 绑定 Worktree、认领任务，记录进度与 Git 感知的检查点。
  5. **交接与评审。** 显式转移负责人，完成评审，并保存决策与验证结果。
- 6. **协调清理并发布。** v0.9.0（自 v0.8 起）清理策略会安全重试或阻塞 Worktree 删除；审计事件与统计为发布提供证据。
+ 6. **协调清理并发布。** v0.10.0（自 v0.8 起）清理策略会安全重试或阻塞 Worktree 删除；审计事件与统计为发布提供证据。
 </Steps>
 </div>
 
