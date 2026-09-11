@@ -24,7 +24,10 @@ jobs:
       - name: Link check (offline)
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --offline --no-progress --verbose "dist/**/*.html"
+          # `--root-dir` is required so root-relative hrefs (`/zh-cn/...`,
+          # `/_astro/...`, `/favicon.svg`) resolve against the built `dist/`
+          # tree instead of erroring with "provide a root dir".
+          args: --offline --no-progress --verbose --root-dir "${{ github.workspace }}/dist" "dist/**/*.html"
           fail: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
