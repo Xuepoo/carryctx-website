@@ -50,7 +50,7 @@ carryctx export --pack-format dir -o ./pack --publication
 git push <remote> refs/heads/carryctx-snapshots
 ```
 
-`--publication` 会执行脱敏处理，写入 `manifest.redacted: true`，并用与 `--snapshot` 相同的 Git plumbing 比较交换，把包按「每次发布一个 commit」提交到 `refs/heads/carryctx-snapshots`——不触碰索引、工作树或网络。本地未脱敏的 `refs/carryctx/local` ref 与 `snapshot_state` 不受影响，且目标不可重定向。绝不要把未脱敏的快照 ref 推送到公开仓库；请使用私有 state 远端、加密通道，或直接交换 pack 目录。脱敏包（`manifest.redacted: true`）是发布产物，可 fresh 或 `replace` 导入，但作为**合并源**会被拒绝（`UNSUPPORTED_OPERATION`，exit 10）。要从公开脱敏包恢复一个 clone，请用 `carryctx import --from-git <ref> --mode replace`。
+`--publication` 会执行脱敏处理，写入 `manifest.redacted: true`，并用与 `--snapshot` 相同的 Git plumbing 比较交换，把包按「每次发布一个 commit」提交到 `refs/heads/carryctx-snapshots`——不触碰索引、工作树或网络。本地未脱敏的 `refs/carryctx/local` ref 与 `snapshot_state` 不受影响，且目标不可重定向。自 0.11.1 起，脱敏除 secret 外还会中和主机标识路径：覆盖每个发布行、`project.json`（`repository_root`/`git_common_dir`）与 `manifest.source` 元数据——用户家目录前缀（`/home/<user>/`、`/Users/<user>/`、`C:\Users\<user>\`）折叠为 `~/` 并保留尾部（用户名永不出现），主机根（`/mnt/**`、`/media/**`、`/run/media/**`、`/private/var/**`、`/var/folders/**`）整体折叠为 `***REDACTED-PATH***`；URL、Git SHA-1、良性 slug 与多字节文本不受影响。绝不要把未脱敏的快照 ref 推送到公开仓库；请使用私有 state 远端、加密通道，或直接交换 pack 目录。脱敏包（`manifest.redacted: true`）是发布产物，可 fresh 或 `replace` 导入，但作为**合并源**会被拒绝（`UNSUPPORTED_OPERATION`，exit 10）。要从公开脱敏包恢复一个 clone，请用 `carryctx import --from-git <ref> --mode replace`。自 0.11.2 起，本地空数据库（尚无 project 行，例如刚迁移完）会直接从包初始化，而不再报错；已有 project 行的库仍需 `--mode replace --yes`。
 
 ## `carryctx import --from-git`
 

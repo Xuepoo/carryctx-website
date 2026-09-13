@@ -68,6 +68,10 @@ This is the same content the `use-carryctx` skill points agents at when it sugge
 CSV output (`carryctx stats --output stats.csv`) is one row per agent with columns `agent_name,sessions,total_seconds,checkpoints,tasks_completed,blockers_reported`, useful for pulling into a spreadsheet across several projects.
 </Aside>
 
+<Aside type="note">
+Since 0.11.2, text-mode `carryctx stats` on an empty local state prints a restore hint when the repository carries an in-repo publication ref (`refs/heads/carryctx-snapshots`, usually `origin/carryctx-snapshots` after a clone) — fetch it and run `carryctx import --from-git <ref> --mode replace`. The hint changes nothing on its own.
+</Aside>
+
 ## `carryctx hooks`
 
 `carryctx hooks` installs Git hooks that keep CarryCtx state in sync with commits automatically, without needing to remember to run `checkpoint` by hand.
@@ -108,7 +112,7 @@ carryctx sync pull --remote /path/to/shared/backup
 
 `sync push` publishes a checkpointed `VACUUM INTO` snapshot of the project's SQLite database into the given local `--remote` directory (required, no default — pick a path you control); `sync pull` brings it back into the local project database location. That's the entire mechanism: a plain local file copy to and from a directory you name. There is no network protocol, no cloud service, no server, no scheduled sync, and the binary ships no network stack at all — `--remote` is a filesystem path, not a URL.
 
-In v0.11.0 (since v0.8), `sync pull` validates the local-directory database fully before it replaces anything, and refuses a database belonging to a different project:
+In v0.11.4 (since v0.8), `sync pull` validates the local-directory database fully before it replaces anything, and refuses a database belonging to a different project:
 
 ```text
 Error: Remote database belongs to a different CarryCtx project.
@@ -124,4 +128,4 @@ Because `sync pull` overwrites the local database wholesale, treat it as a full-
 
 ## Moving state across machines
 
-`sync` copies a whole database file; `export`/`import` (0.11.0, since 0.8.2) go one step further and produce a portable directory (`manifest.json` plus per-table `*.jsonl`) that survives path changes between machines — importing into a fresh checkout re-anchors absolute paths instead of carrying the old ones over. Transport is still yours (`scp`, a shared folder, Syncthing); CarryCtx only serializes, validates, and swaps atomically. Start with `carryctx export --help`.
+`sync` copies a whole database file; `export`/`import` (0.11.4, since 0.8.2) go one step further and produce a portable directory (`manifest.json` plus per-table `*.jsonl`) that survives path changes between machines — importing into a fresh checkout re-anchors absolute paths instead of carrying the old ones over. Transport is still yours (`scp`, a shared folder, Syncthing); CarryCtx only serializes, validates, and swaps atomically. Start with `carryctx export --help`.
