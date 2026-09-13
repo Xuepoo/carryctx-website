@@ -61,11 +61,12 @@ carryctx graph link <SOURCE_ULID> <TARGET_ULID> depends_on
 # 按需从单个文件提取 depends_on 边
 carryctx graph extract-deps src/auth/session.rs
 
-# 列出与某节点相连的所有边
+# 列出与某节点相连的所有边（ULID、精确节点名或无歧义名称后缀均可）
 carryctx graph edges <NODE_ULID>
+carryctx graph edges src/auth/session.rs
 ```
 
-`add-node` 接受 `--node-type`（例如 `file`、`module`、`decision`）和 `--name`，可选 `--description`。`link` 接受源节点 ULID、目标节点 ULID，以及一个自由文本的关系字符串（约定用 `depends_on`，但图谱本身不强制固定词汇）。`edges` 接受一个节点 ULID，列出与它双向相连的所有边。
+`add-node` 接受 `--node-type`（例如 `file`、`module`、`decision`）和 `--name`，可选 `--description`。`link` 接受源节点 ULID、目标节点 ULID，以及一个自由文本的关系字符串（约定用 `depends_on`，但图谱本身不强制固定词汇）。自 0.11.4 起，`edges` 接受节点 ULID、精确节点名或无歧义名称后缀（与 `export --focus` 一致的解析顺序），列出与解析后节点双向相连的所有边；未知引用返回 `RESOURCE_NOT_FOUND`，多命中返回 `VALIDATION_FAILED`。Rust brace 分组 `use`（`use crate::path::{a, b};`）会被 `extract-deps` 与 `scan` 展开为逐个模块依赖。
 
 ## 导出图谱
 

@@ -61,11 +61,12 @@ carryctx graph link <SOURCE_ULID> <TARGET_ULID> depends_on
 # Extract depends_on edges from a single file on demand
 carryctx graph extract-deps src/auth/session.rs
 
-# List every edge connected to a node
+# List every edge connected to a node (ULID, exact name, or unambiguous name suffix)
 carryctx graph edges <NODE_ULID>
+carryctx graph edges src/auth/session.rs
 ```
 
-`add-node` takes `--node-type` (e.g. `file`, `module`, `decision`) and `--name`, with an optional `--description`. `link` takes a source ULID, a target ULID, and a free-form relation string (conventionally `depends_on`, but the graph doesn't enforce a fixed vocabulary). `edges` takes the ULID of a node and lists everything connected to it, in either direction.
+`add-node` takes `--node-type` (e.g. `file`, `module`, `decision`) and `--name`, with an optional `--description`. `link` takes a source ULID, a target ULID, and a free-form relation string (conventionally `depends_on`, but the graph doesn't enforce a fixed vocabulary). Since 0.11.4, `edges` accepts a node ULID, an exact node name, or an unambiguous name suffix (same resolution order as `export --focus`) and lists everything connected to the resolved node, in either direction; unknown references fail with `RESOURCE_NOT_FOUND` and ambiguous ones with `VALIDATION_FAILED`. Rust `use` statements with brace groups (`use crate::path::{a, b};`) are expanded into individual dependencies by `extract-deps` and `scan`.
 
 ## Exporting the graph
 
